@@ -112,6 +112,10 @@ function! s:SetupUI()
   set noruler
   set cmdheight=1
   set mouse=
+
+  " Hide the terminal cursor - let PlayerChar highlight be the visual indicator
+  " This makes the @ appear with proper white-on-black highlighting
+  set t_ve=
 endfunction
 
 " Get the current level's metadata

@@ -6,7 +6,12 @@ let s:active_highlights = {}  " id -> {group, line, col}
 
 " Define standard highlight groups
 highlight ErrorCell cterm=reverse gui=reverse
-highlight PlayerChar ctermfg=White ctermbg=Black guifg=White guibg=Black
+highlight PlayerChar cterm=bold ctermfg=White ctermbg=Black guifg=White guibg=Black
+
+" Override cursor highlighting to match PlayerChar (white on black)
+highlight Cursor ctermfg=White ctermbg=Black guifg=White guibg=Black
+highlight CursorLine NONE
+highlight CursorColumn NONE
 
 " Add highlight at character position
 " @param group: highlight group name (e.g., 'ErrorCell', 'PlayerChar')
