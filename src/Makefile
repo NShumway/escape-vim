@@ -1684,6 +1684,7 @@ OBJ_COMMON = \
 	objects/float.o \
 	objects/fold.o \
 	objects/fuzzy.o \
+	objects/game.o \
 	objects/getchar.o \
 	objects/gc.o \
 	objects/gui_xim.o \
@@ -3291,6 +3292,9 @@ objects/fold.o: fold.c
 
 objects/fuzzy.o: fuzzy.c
 	$(CCC) -o $@ fuzzy.c
+
+objects/game.o: ../game/game.c ../game/game.h
+	$(CCC) -o $@ ../game/game.c
 
 objects/getchar.o: getchar.c
 	$(CCC) -o $@ getchar.c

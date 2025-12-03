@@ -13,12 +13,18 @@
 #define USING_FLOAT_STUFF
 
 #include "vim.h"
+#include "../game/game.h"
 
 #if defined(FEAT_EVAL)
 
 #ifdef VMS
 # include <float.h>
 #endif
+
+// Escape Room: Vim game functions (defined in game/game.c)
+void f_game_set_exit(typval_T *argvars, typval_T *rettv);
+void f_game_is_active(typval_T *argvars, typval_T *rettv);
+void f_game_check_quit(typval_T *argvars, typval_T *rettv);
 
 static void f_and(typval_T *argvars, typval_T *rettv);
 #ifdef FEAT_BEVAL
@@ -2259,6 +2265,13 @@ static const funcentry_T global_functions[] =
 			ret_func_unknown,   f_funcref},
     {"function",	1, 3, FEARG_1,	    arg3_any_list_dict,
 			ret_func_unknown,   f_function},
+    // Escape Room: Vim game functions
+    {"gamecheckquit",	0, 0, 0,	    NULL,
+			ret_number,	    f_game_check_quit},
+    {"gameisactive",	0, 0, 0,	    NULL,
+			ret_number,	    f_game_is_active},
+    {"gamesetexit",	2, 2, 0,	    arg2_number,
+			ret_void,	    f_game_set_exit},
     {"garbagecollect",	0, 1, 0,	    arg1_bool,
 			ret_void,	    f_garbagecollect},
     {"get",		2, 3, FEARG_1,	    arg23_get,

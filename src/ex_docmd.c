@@ -12,6 +12,7 @@
  */
 
 #include "vim.h"
+#include "../game/game.h"
 
 static int	quitmore = 0;
 static int	ex_pressedreturn = FALSE;
@@ -6105,6 +6106,10 @@ ex_quit(exarg_T *eap)
 {
     win_T	*wp;
 
+    // Escape Room: Vim - block quit if game is active and not at exit
+    if (game_is_active() && !game_check_quit_allowed())
+	return;
+
     if (cmdwin_type != 0)
     {
 	cmdwin_result = Ctrl_C;
@@ -6217,6 +6222,10 @@ before_quit_all(exarg_T *eap)
     static void
 ex_quit_all(exarg_T *eap)
 {
+    // Escape Room: Vim - block quit if game is active and not at exit
+    if (game_is_active() && !game_check_quit_allowed())
+	return;
+
     if (before_quit_all(eap) == FAIL)
 	return;
     exiting = TRUE;
@@ -6706,6 +6715,10 @@ ex_stop(exarg_T *eap)
     static void
 ex_exit(exarg_T *eap)
 {
+    // Escape Room: Vim - block quit if game is active and not at exit
+    if (game_is_active() && !game_check_quit_allowed())
+	return;
+
 #ifdef FEAT_EVAL
     if (not_in_vim9(eap) == FAIL)
 	return;
