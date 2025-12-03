@@ -28,8 +28,13 @@ function! s:OnCursorMoved()
   let char = getline('.')[l:cur_col - 1]
 
   if char == '#'
-    " On a wall - enter error state and bounce back
-    call s:EnterErrorState(l:cur_line, l:cur_col)
+    " On a wall - always bounce back immediately
+    call cursor(s:last_valid_pos[0], s:last_valid_pos[1])
+
+    " Only show visual feedback if not already in error state
+    if !s:in_error_state
+      call s:EnterErrorState(l:cur_line, l:cur_col)
+    endif
   elseif !s:in_error_state
     " On valid ground and not in error cooldown - update last valid position
     let s:last_valid_pos = [l:cur_line, l:cur_col]
@@ -37,15 +42,7 @@ function! s:OnCursorMoved()
 endfunction
 
 function! s:EnterErrorState(wall_line, wall_col)
-  " Ignore if already in error state (prevents re-entry during bounce)
-  if s:in_error_state
-    return
-  endif
-
   let s:in_error_state = 1
-
-  " Immediately bounce back to last valid position
-  call cursor(s:last_valid_pos[0], s:last_valid_pos[1])
 
   " Visual: highlight the wall cell we hit
   let s:error_match_id = matchadd('ErrorCell', '\%' . a:wall_line . 'l\%' . a:wall_col . 'c.')
