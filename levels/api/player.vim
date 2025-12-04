@@ -66,3 +66,12 @@ endfunction
 function! Player_SetFloorChar(char)
   let s:floor_char = a:char
 endfunction
+
+" Reset player state (call when leaving level)
+function! Player_Cleanup()
+  if s:player_highlight_id
+    call Highlight_Remove(s:player_highlight_id)
+    let s:player_highlight_id = 0
+  endif
+  let s:player_pos = [0, 0]
+endfunction

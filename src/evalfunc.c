@@ -23,7 +23,7 @@
 
 // Escape Room: Vim game functions (defined in game/game.c)
 void f_game_set_exit(typval_T *argvars, typval_T *rettv);
-void f_game_is_active(typval_T *argvars, typval_T *rettv);
+void f_game_in_level(typval_T *argvars, typval_T *rettv);
 void f_game_check_quit(typval_T *argvars, typval_T *rettv);
 
 static void f_and(typval_T *argvars, typval_T *rettv);
@@ -2268,8 +2268,8 @@ static const funcentry_T global_functions[] =
     // Escape Room: Vim game functions
     {"gamecheckquit",	0, 0, 0,	    NULL,
 			ret_number,	    f_game_check_quit},
-    {"gameisactive",	0, 0, 0,	    NULL,
-			ret_number,	    f_game_is_active},
+    {"gameinlevel",	0, 0, 0,	    NULL,
+			ret_number,	    f_game_in_level},
     {"gamesetexit",	2, 2, 0,	    arg2_number,
 			ret_void,	    f_game_set_exit},
     {"garbagecollect",	0, 1, 0,	    arg1_bool,

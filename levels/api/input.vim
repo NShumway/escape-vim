@@ -1,8 +1,8 @@
 " Input API for Escape Vim
 " Declarative command blocking/allowing per level
 
-" Command Categories
-let g:GameCommandCategories = {
+" Command Categories (module-private)
+let s:command_categories = {
   \ 'arrows': ['<Up>', '<Down>', '<Left>', '<Right>'],
   \ 'search': ['/', '?', 'n', 'N', '*', '#'],
   \ 'find_char': ['f', 'F', 't', 'T', ';', ','],
@@ -38,11 +38,11 @@ function! s:OnBlocked(key, category)
 endfunction
 
 " Block all commands in specified categories
-" @param categories: list of category names from g:GameCommandCategories
+" @param categories: list of category names from s:command_categories
 function! Input_BlockCategories(categories)
   for l:cat in a:categories
-    if has_key(g:GameCommandCategories, l:cat)
-      call Input_BlockKeys(g:GameCommandCategories[l:cat], l:cat)
+    if has_key(s:command_categories, l:cat)
+      call Input_BlockKeys(s:command_categories[l:cat], l:cat)
     endif
   endfor
 endfunction
@@ -52,11 +52,8 @@ endfunction
 " @param category: category name for the block message
 function! Input_BlockKeys(keys, category)
   for l:key in a:keys
-    " Need to escape special characters for the mapping
-    let l:escaped_key = escape(l:key, '"')
-    let l:escaped_cat = escape(a:category, '"')
-    execute 'nnoremap <buffer> <silent> ' . l:key .
-          \ ' :call <SID>OnBlocked("' . l:escaped_key . '", "' . l:escaped_cat . '")<CR>'
+    " Map to <Nop> for silent blocking - no command line output
+    execute 'nnoremap <buffer> <silent> ' . l:key . ' <Nop>'
   endfor
 endfunction
 
@@ -64,8 +61,8 @@ endfunction
 " @param categories: list of category names
 function! Input_UnblockCategories(categories)
   for l:cat in a:categories
-    if has_key(g:GameCommandCategories, l:cat)
-      for l:key in g:GameCommandCategories[l:cat]
+    if has_key(s:command_categories, l:cat)
+      for l:key in s:command_categories[l:cat]
         silent! execute 'nunmap <buffer> ' . l:key
       endfor
     endif
@@ -74,10 +71,10 @@ endfunction
 
 " Block all categories (for restrictive levels)
 function! Input_BlockAll()
-  call Input_BlockCategories(keys(g:GameCommandCategories))
+  call Input_BlockCategories(keys(s:command_categories))
 endfunction
 
 " Unblock all commands
 function! Input_UnblockAll()
-  call Input_UnblockCategories(keys(g:GameCommandCategories))
+  call Input_UnblockCategories(keys(s:command_categories))
 endfunction

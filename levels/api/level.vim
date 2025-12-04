@@ -12,6 +12,7 @@ function! Level_Load(level_path)
   let s:level_path = a:level_path
 
   " 1. Load APIs (order matters - position first, others depend on it)
+  source levels/api/util.vim
   source levels/api/position.vim
   source levels/api/buffer.vim
   source levels/api/highlight.vim
@@ -29,8 +30,13 @@ function! Level_Load(level_path)
   " 4. Initialize viewport
   call ViewportInit(s:current_meta)
 
-  " 5. Load the maze file
+  " 5. Load the maze file (force reload from disk)
   let l:maze_path = a:level_path . '/maze.txt'
+  " Delete any existing buffer for this file to ensure fresh load
+  let l:bufnr = bufnr(l:maze_path)
+  if l:bufnr != -1
+    execute 'bwipeout! ' . l:bufnr
+  endif
   execute 'edit ' . l:maze_path
   setlocal buftype=nofile
   setlocal noswapfile
@@ -129,6 +135,40 @@ endfunction
 function! Level_AtExit()
   let l:pos = Player_GetPos()
   return l:pos[0] == s:exit_pos[0] && l:pos[1] == s:exit_pos[1]
+endfunction
+
+" Clean up level state (call when leaving gameplay)
+function! Level_Cleanup()
+  " Only clean up if a level was actually loaded
+  if s:level_path == ''
+    return
+  endif
+
+  " Clear autocommands
+  augroup GameLevel
+    autocmd!
+  augroup END
+
+  " Clean up API module state (these are defined after Level_Load sources the files)
+  if exists('*Highlight_ClearAll')
+    call Highlight_ClearAll()
+  endif
+  if exists('*Player_Cleanup')
+    call Player_Cleanup()
+  endif
+  if exists('*Collision_Cleanup')
+    call Collision_Cleanup()
+  endif
+
+  " Restore viewport settings
+  if exists('*ViewportDisableCenter')
+    call ViewportDisableCenter()
+  endif
+
+  " Reset level state
+  let s:current_meta = {}
+  let s:exit_pos = [0, 0]
+  let s:level_path = ''
 endfunction
 
 " Attempt to quit the level (only succeeds if at exit)

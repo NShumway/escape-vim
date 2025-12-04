@@ -84,3 +84,10 @@ function! Collision_OnMove()
   let s:last_valid_pos = [l:line, l:col]
   return {'blocked': 0, 'pos': [l:line, l:col]}
 endfunction
+
+" Reset collision state (call when leaving level)
+function! Collision_Cleanup()
+  let s:last_valid_pos = [0, 0]
+  let s:in_error_state = 0
+  let s:wall_callback = v:null
+endfunction
