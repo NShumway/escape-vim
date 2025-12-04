@@ -8,6 +8,37 @@
 " Track if we're in active gameplay
 let s:gameplay_active = 0
 
+" Game statistics (owned by this module)
+let s:start_time = 0
+let s:move_count = 0
+let s:final_time = 0
+let s:final_moves = 0
+
+" ============================================================================
+" Stats Getters
+" ============================================================================
+
+" Get elapsed time since gameplay started
+function! Gameplay_GetElapsed()
+  return localtime() - s:start_time
+endfunction
+
+" Get current move count
+function! Gameplay_GetMoves()
+  return s:move_count
+endfunction
+
+" Get final stats (frozen at level completion)
+function! Gameplay_GetFinalStats()
+  return {'time': s:final_time, 'moves': s:final_moves}
+endfunction
+
+" Freeze final stats at level completion
+function! Gameplay_FreezeFinalStats()
+  let s:final_time = localtime() - s:start_time
+  let s:final_moves = s:move_count
+endfunction
+
 " ============================================================================
 " Gameplay Lifecycle
 " ============================================================================
@@ -17,14 +48,14 @@ function! Gameplay_Start()
   let s:gameplay_active = 1
 
   " Initialize game stats
-  let g:game_start_time = localtime()
-  let g:game_move_count = 0
+  let s:start_time = localtime()
+  let s:move_count = 0
 
   " Render sideport in gameplay mode
-  let l:meta = g:current_level_meta
+  let l:meta = Game_GetLevelMeta()
   let l:commands = Game_GetAllCommands()
   call Sideport_RenderGameplay(
-        \ g:current_level_id,
+        \ Game_GetLevelId(),
         \ get(l:meta, 'title', 'Unknown'),
         \ get(l:meta, 'objective', ''),
         \ l:commands,
@@ -36,7 +67,7 @@ function! Gameplay_Start()
   call Sideport_StartTimer()
 
   " Load the actual level (maze)
-  call Level_Load(g:current_level_path)
+  call Level_Load(Game_GetLevelPath())
 
   " Set up move tracking
   augroup GameplayMoveTracking
@@ -71,7 +102,7 @@ endfunction
 " Called on each cursor movement
 function! s:OnMove()
   if s:gameplay_active
-    let g:game_move_count += 1
+    let s:move_count += 1
   endif
 endfunction
 
@@ -113,19 +144,19 @@ function! Gameplay_UpdateSideport()
     return
   endif
 
-  let l:elapsed = localtime() - g:game_start_time
+  let l:elapsed = Gameplay_GetElapsed()
   let l:mins = l:elapsed / 60
   let l:secs = l:elapsed % 60
   let l:time_str = printf('%02d:%02d', l:mins, l:secs)
 
-  let l:meta = g:current_level_meta
+  let l:meta = Game_GetLevelMeta()
   let l:commands = Game_GetAllCommands()
   call Sideport_RenderGameplay(
-        \ g:current_level_id,
+        \ Game_GetLevelId(),
         \ get(l:meta, 'title', 'Unknown'),
         \ get(l:meta, 'objective', ''),
         \ l:commands,
         \ l:time_str,
-        \ g:game_move_count
+        \ Gameplay_GetMoves()
         \ )
 endfunction

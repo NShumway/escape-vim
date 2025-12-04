@@ -6,22 +6,33 @@
 " ============================================================================
 
 " Current game state: 'LORE' | 'GAMEPLAY' | 'FIREWORKS' | 'RESULTS' | 'DEFEAT'
+" This is the only true global - the state machine value
 let g:game_state = 'LORE'
 
-" Current level data
-let g:current_level_id = 1
-let g:current_level_meta = {}
-let g:current_level_path = ''
-
-" Game statistics for current run
-let g:game_start_time = 0
-let g:game_move_count = 0
-let g:game_final_time = 0
-let g:game_final_moves = 0
+" Current level data (module-private)
+let s:current_level_id = 1
+let s:current_level_meta = {}
+let s:current_level_path = ''
 
 " Timer IDs for cleanup
 let s:firework_timer = -1
 let s:transition_timer = -1
+
+" ============================================================================
+" Level Data Getters
+" ============================================================================
+
+function! Game_GetLevelId()
+  return s:current_level_id
+endfunction
+
+function! Game_GetLevelMeta()
+  return s:current_level_meta
+endfunction
+
+function! Game_GetLevelPath()
+  return s:current_level_path
+endfunction
 
 " ============================================================================
 " State Transitions
@@ -98,7 +109,7 @@ endfunction
 " @param level_id: numeric level ID
 " @return: 1 on success, 0 on failure (will quit with error)
 function! Game_LoadLevelMeta(level_id)
-  let g:current_level_id = a:level_id
+  let s:current_level_id = a:level_id
 
   " Read manifest to find level directory
   let l:manifest = eval(join(readfile('levels/manifest.vim'), ''))
@@ -106,7 +117,7 @@ function! Game_LoadLevelMeta(level_id)
   let l:found = 0
   for l:entry in l:manifest
     if l:entry.id == a:level_id
-      let g:current_level_path = 'levels/' . l:entry.dir
+      let s:current_level_path = 'levels/' . l:entry.dir
       let l:found = 1
       break
     endif
@@ -118,14 +129,14 @@ function! Game_LoadLevelMeta(level_id)
   endif
 
   " Load the metadata
-  let l:meta_path = g:current_level_path . '/meta.vim'
+  let l:meta_path = s:current_level_path . '/meta.vim'
 
   if !filereadable(l:meta_path)
     call Game_QuitWithError("Level metadata not found: " . l:meta_path)
     return 0
   endif
 
-  let g:current_level_meta = eval(join(readfile(l:meta_path), ''))
+  let s:current_level_meta = eval(join(readfile(l:meta_path), ''))
   return 1
 endfunction
 
@@ -151,8 +162,8 @@ function! Game_GetAllCommands()
   endfor
 
   " Add current level's commands (if not already included)
-  if index(l:completed, g:current_level_id) < 0
-    let l:all_commands += get(g:current_level_meta, 'commands', [])
+  if index(l:completed, s:current_level_id) < 0
+    let l:all_commands += get(s:current_level_meta, 'commands', [])
   endif
 
   return l:all_commands
@@ -170,21 +181,21 @@ function! Game_Start()
   " Determine which level to show
   let l:completed = get(l:save, 'completed_levels', [])
   if empty(l:completed)
-    let g:current_level_id = 1
+    let s:current_level_id = 1
   else
     " Find next incomplete level
     let l:manifest = eval(join(readfile('levels/manifest.vim'), ''))
-    let g:current_level_id = 1
+    let s:current_level_id = 1
     for l:entry in l:manifest
       if index(l:completed, l:entry.id) < 0
-        let g:current_level_id = l:entry.id
+        let s:current_level_id = l:entry.id
         break
       endif
     endfor
   endif
 
   " Load level metadata
-  call Game_LoadLevelMeta(g:current_level_id)
+  call Game_LoadLevelMeta(s:current_level_id)
 
   " Start in LORE state
   call GameTransition('LORE')
@@ -192,12 +203,12 @@ endfunction
 
 " Called when player completes a level (win conditions met)
 function! Game_LevelComplete()
-  " Calculate and store final stats (so they don't keep ticking)
-  let g:game_final_time = localtime() - g:game_start_time
-  let g:game_final_moves = g:game_move_count
+  " Freeze final stats in gameplay module (so they don't keep ticking)
+  call Gameplay_FreezeFinalStats()
 
   " Save progress
-  call Save_CompleteLevel(g:current_level_id, g:game_final_time, g:game_final_moves)
+  let l:stats = Gameplay_GetFinalStats()
+  call Save_CompleteLevel(s:current_level_id, l:stats.time, l:stats.moves)
 
   " Transition to fireworks
   call GameTransition('FIREWORKS')

@@ -254,19 +254,19 @@ function! s:UpdateTimer(timer)
     return
   endif
 
-  let l:elapsed = localtime() - g:game_start_time
+  let l:elapsed = Gameplay_GetElapsed()
   let l:time_str = Util_FormatTime(l:elapsed)
 
   " Re-render the gameplay sideport
-  let l:meta = g:current_level_meta
+  let l:meta = Game_GetLevelMeta()
   let l:commands = Game_GetAllCommands()
   call Sideport_RenderGameplay(
-        \ g:current_level_id,
+        \ Game_GetLevelId(),
         \ get(l:meta, 'title', 'Unknown'),
         \ get(l:meta, 'objective', ''),
         \ l:commands,
         \ l:time_str,
-        \ g:game_move_count
+        \ Gameplay_GetMoves()
         \ )
 endfunction
 

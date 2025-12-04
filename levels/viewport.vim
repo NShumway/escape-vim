@@ -10,10 +10,10 @@ let s:viewport_cols = 80
 let s:pad_top = 0
 let s:pad_left = 0
 
-" Flag to disable terminal resizing (set by UI flow)
-if !exists('g:viewport_disable_resize')
-  let g:viewport_disable_resize = 0
-endif
+" Check if resize is disabled (UI flow sets this via UI_IsResizeDisabled)
+function! s:IsResizeDisabled()
+  return exists('*UI_IsResizeDisabled') && UI_IsResizeDisabled()
+endfunction
 
 " ============================================================================
 " Terminal Resize
@@ -27,7 +27,7 @@ function! ViewportSetSize(lines, cols)
   let s:viewport_cols = a:cols
 
   " Resize terminal window (unless disabled by UI flow)
-  if !g:viewport_disable_resize
+  if !s:IsResizeDisabled()
     execute 'set lines=' . a:lines
     execute 'set columns=' . a:cols
   endif

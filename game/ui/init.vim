@@ -2,10 +2,14 @@
 " Launch with: ./src/vim --clean -S game/ui/init.vim
 
 " ============================================================================
-" Disable viewport terminal resizing (we manage our own layout)
+" Viewport resize control (we manage our own layout)
 " ============================================================================
 
-let g:viewport_disable_resize = 1
+let s:viewport_disable_resize = 1
+
+function! UI_IsResizeDisabled()
+  return s:viewport_disable_resize
+endfunction
 
 " ============================================================================
 " Load Level API (needed for gameplay)

@@ -29,14 +29,14 @@ function! Lore_Render()
   let s:unlocked_levels = Save_GetUnlockedLevels()
 
   " Find index of current level
-  let s:selected_level_idx = index(s:unlocked_levels, g:current_level_id)
+  let s:selected_level_idx = index(s:unlocked_levels, Game_GetLevelId())
   if s:selected_level_idx < 0
     let s:selected_level_idx = 0
   endif
 
   " Show sideport with commander quote
   call Sideport_Show()
-  let l:quote = get(g:current_level_meta, 'quote', '')
+  let l:quote = get(Game_GetLevelMeta(), 'quote', '')
   call Sideport_RenderLore(l:quote)
 
   " Render main content area
@@ -59,7 +59,7 @@ function! s:RenderMainArea()
   call add(l:lines, '')
 
   " Load and display lore text
-  let l:lore_path = g:current_level_path . '/lore.txt'
+  let l:lore_path = Game_GetLevelPath() . '/lore.txt'
   if filereadable(l:lore_path)
     let l:lore_lines = readfile(l:lore_path)
     for l:line in l:lore_lines

@@ -34,7 +34,7 @@ endfunction
 function! Results_Render()
   " Show sideport with victory quote
   call Sideport_Show()
-  let l:victory_quote = get(g:current_level_meta, 'victory_quote', 'Well done!')
+  let l:victory_quote = get(Game_GetLevelMeta(), 'victory_quote', 'Well done!')
   call Sideport_RenderResults(l:victory_quote)
 
   " Render main content
@@ -54,8 +54,9 @@ function! s:RenderMainArea()
   let l:lines = []
 
   " Get player's final stats (stored at level completion, not live)
-  let l:elapsed = g:game_final_time
-  let l:moves = g:game_final_moves
+  let l:stats = Gameplay_GetFinalStats()
+  let l:elapsed = l:stats.time
+  let l:moves = l:stats.moves
   let l:time_str = Util_FormatTime(l:elapsed)
 
   " Top area with subtle animated stars
@@ -70,7 +71,7 @@ function! s:RenderMainArea()
   call add(l:lines, '      ║                               ║')
   call add(l:lines, '      ║     MISSION ACCOMPLISHED      ║')
   call add(l:lines, '      ║                               ║')
-  call add(l:lines, '      ║     Level ' . g:current_level_id . ': ' . printf('%-17s', get(g:current_level_meta, 'title', 'Unknown')) . ' ║')
+  call add(l:lines, '      ║     Level ' . Game_GetLevelId() . ': ' . printf('%-17s', get(Game_GetLevelMeta(), 'title', 'Unknown')) . ' ║')
   call add(l:lines, '      ║                               ║')
   call add(l:lines, '      ╚═══════════════════════════════╝')
   call add(l:lines, '')
