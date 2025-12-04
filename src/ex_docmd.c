@@ -6106,15 +6106,22 @@ ex_quit(exarg_T *eap)
 {
     win_T	*wp;
 
-    // Escape Room: Vim - handle game quit
+    // Escape Room: Vim - always intercept :q
     if (game_is_active())
     {
-	if (!game_check_quit_allowed())
-	    return;  // Not at exit, block quit
-	// At exit - trigger User GameLevelComplete event and return
-	// Don't actually quit; let Vimscript handle the level transition
-	apply_autocmds(EVENT_USER, (char_u *)"GameLevelComplete",
-		       curbuf->b_fname, TRUE, curbuf);
+	// In level - check win conditions
+	if (game_check_win_conditions())
+	    apply_autocmds(EVENT_USER, (char_u *)"GameLevelComplete",
+			   curbuf->b_fname, TRUE, curbuf);
+	else
+	    apply_autocmds(EVENT_USER, (char_u *)"GameLevelFailed",
+			   curbuf->b_fname, TRUE, curbuf);
+	return;
+    }
+    else
+    {
+	// Between levels - quit everything
+	getout(0);
 	return;
     }
 
@@ -6230,13 +6237,22 @@ before_quit_all(exarg_T *eap)
     static void
 ex_quit_all(exarg_T *eap)
 {
-    // Escape Room: Vim - handle game quit
+    // Escape Room: Vim - always intercept :qa
     if (game_is_active())
     {
-	if (!game_check_quit_allowed())
-	    return;  // Not at exit, block quit
-	apply_autocmds(EVENT_USER, (char_u *)"GameLevelComplete",
-		       curbuf->b_fname, TRUE, curbuf);
+	// In level - check win conditions
+	if (game_check_win_conditions())
+	    apply_autocmds(EVENT_USER, (char_u *)"GameLevelComplete",
+			   curbuf->b_fname, TRUE, curbuf);
+	else
+	    apply_autocmds(EVENT_USER, (char_u *)"GameLevelFailed",
+			   curbuf->b_fname, TRUE, curbuf);
+	return;
+    }
+    else
+    {
+	// Between levels - quit everything
+	getout(0);
 	return;
     }
 
@@ -6729,13 +6745,15 @@ ex_stop(exarg_T *eap)
     static void
 ex_exit(exarg_T *eap)
 {
-    // Escape Room: Vim - handle game quit
+    // Escape Room: Vim - check win conditions and fire appropriate event
     if (game_is_active())
     {
-	if (!game_check_quit_allowed())
-	    return;  // Not at exit, block quit
-	apply_autocmds(EVENT_USER, (char_u *)"GameLevelComplete",
-		       curbuf->b_fname, TRUE, curbuf);
+	if (game_check_win_conditions())
+	    apply_autocmds(EVENT_USER, (char_u *)"GameLevelComplete",
+			   curbuf->b_fname, TRUE, curbuf);
+	else
+	    apply_autocmds(EVENT_USER, (char_u *)"GameLevelFailed",
+			   curbuf->b_fname, TRUE, curbuf);
 	return;
     }
 

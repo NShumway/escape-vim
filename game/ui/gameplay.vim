@@ -76,22 +76,28 @@ endfunction
 " Quit Handling
 " ============================================================================
 
-" Set up custom quit handling for level completion
+" Set up custom quit handling for level completion/failure
 function! s:SetupQuitHandling()
-  " Listen for the C-level GameLevelComplete event
-  " This is triggered when :q is typed at the exit position
+  " Listen for the C-level game events
+  " GameLevelComplete: win conditions met
+  " GameLevelFailed: win conditions not met
   augroup GameLevelExit
     autocmd!
     autocmd User GameLevelComplete call s:OnLevelComplete()
+    autocmd User GameLevelFailed call s:OnLevelFailed()
   augroup END
 endfunction
 
-" Called when player successfully quits at exit position
+" Called when player quits with win conditions met
 function! s:OnLevelComplete()
-  " Clean up gameplay state
   call Gameplay_Stop()
-  " Trigger level completion flow (fireworks, results, etc.)
   call Game_LevelComplete()
+endfunction
+
+" Called when player quits without meeting win conditions
+function! s:OnLevelFailed()
+  call Gameplay_Stop()
+  call Game_LevelFailed()
 endfunction
 
 " ============================================================================

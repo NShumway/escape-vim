@@ -27,6 +27,7 @@ source game/ui/sideport.vim
 source game/ui/lore.vim
 source game/ui/gameplay.vim
 source game/ui/fireworks.vim
+source game/ui/defeat.vim
 source game/ui/results.vim
 
 " Load state machine last (orchestrates everything)

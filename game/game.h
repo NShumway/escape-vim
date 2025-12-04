@@ -9,21 +9,26 @@
 /*
  * Set the exit position for the current level.
  * row and col are 1-indexed (vim convention).
- * Called from Vimscript via GameSetExit(row, col).
+ * Set to (0, 0) when leaving a level.
  */
 void game_set_exit(int row, int col);
 
 /*
- * Check if the player is allowed to quit.
- * Returns 1 if cursor is at the exit position, 0 otherwise.
- * Called from ex_docmd.c when processing quit commands.
+ * Check if currently in a level (exit position set).
  */
-int game_check_quit_allowed(void);
+int game_in_level(void);
 
 /*
- * Check if game mode is active.
- * Returns 1 if an exit position has been set, 0 otherwise.
+ * Check if game is active (in a level where :q should be intercepted).
+ * Returns 1 if in a level, 0 otherwise.
+ * When not active, :q should quit Vim entirely.
  */
 int game_is_active(void);
+
+/*
+ * Check if win conditions are met.
+ * Returns 1 if cursor is at the exit position (win), 0 otherwise (fail).
+ */
+int game_check_win_conditions(void);
 
 #endif /* GAME_H */

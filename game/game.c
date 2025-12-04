@@ -6,12 +6,13 @@
 #include "vim.h"
 #include "game.h"
 
-/* Exit position for the current level (1-indexed) */
-static int exit_row = -1;
-static int exit_col = -1;
+/* Exit position for current level (1-indexed, 0 = not in level) */
+static int exit_row = 0;
+static int exit_col = 0;
 
 /*
  * Set the exit position for the current level.
+ * Set to (0, 0) when leaving a level.
  */
     void
 game_set_exit(int row, int col)
@@ -21,26 +22,36 @@ game_set_exit(int row, int col)
 }
 
 /*
- * Check if game mode is active.
+ * Check if currently in a level (exit position set).
  */
     int
-game_is_active(void)
+game_in_level(void)
 {
     return (exit_row > 0 && exit_col > 0);
 }
 
 /*
- * Check if the player is allowed to quit.
- * Returns 1 if cursor is at the exit position, 0 otherwise.
+ * Check if game is active (in a level where :q should be intercepted).
+ * This is an alias for game_in_level - when in a level, :q triggers
+ * win/fail checks. When NOT in a level (between screens), :q quits Vim.
  */
     int
-game_check_quit_allowed(void)
+game_is_active(void)
+{
+    return game_in_level();
+}
+
+/*
+ * Check if win conditions are met.
+ * Returns 1 if cursor is at the exit position (win), 0 otherwise (fail).
+ */
+    int
+game_check_win_conditions(void)
 {
     int cur_row;
     int cur_col;
 
-    /* If no exit set, allow quit (game not active) */
-    if (!game_is_active())
+    if (!game_in_level())
 	return 1;
 
     /* Get current cursor position (1-indexed) */
@@ -51,7 +62,7 @@ game_check_quit_allowed(void)
 }
 
 /*
- * Vimscript function: GameSetExit(row, col)
+ * Vimscript function: gamesetexit(row, col)
  * Sets the exit position for quit interception.
  */
     void
@@ -73,23 +84,23 @@ f_game_set_exit(typval_T *argvars, typval_T *rettv UNUSED)
 }
 
 /*
- * Vimscript function: GameIsActive()
- * Returns 1 if game mode is active, 0 otherwise.
+ * Vimscript function: gameinlevel()
+ * Returns 1 if in a level, 0 otherwise.
  */
     void
-f_game_is_active(typval_T *argvars UNUSED, typval_T *rettv)
+f_game_in_level(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_NUMBER;
-    rettv->vval.v_number = game_is_active();
+    rettv->vval.v_number = game_in_level();
 }
 
 /*
- * Vimscript function: GameCheckQuit()
- * Returns 1 if quit is allowed, 0 otherwise.
+ * Vimscript function: gamecheckquit()
+ * Returns 1 if win conditions met (at exit), 0 otherwise.
  */
     void
 f_game_check_quit(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_NUMBER;
-    rettv->vval.v_number = game_check_quit_allowed();
+    rettv->vval.v_number = game_check_win_conditions();
 }

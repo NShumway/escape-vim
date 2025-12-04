@@ -139,6 +139,10 @@ function! s:SetupInput()
 
   " Start game
   nnoremap <buffer> <silent> <CR> :call <SID>StartLevel()<CR>
+
+  " ZZ/ZQ to quit (`:q` works via normal Ex command since game is inactive)
+  nnoremap <buffer> <silent> ZZ :qa!<CR>
+  nnoremap <buffer> <silent> ZQ :qa!<CR>
 endfunction
 
 " Select next level

@@ -61,9 +61,16 @@ function! Sideport_Show()
 
   let l:bufnr = Sideport_GetBuffer()
 
-  " Create vertical split on the left
-  execute 'topleft vertical ' . s:GetSideportWidth() . 'split'
-  execute 'buffer ' . l:bufnr
+  " Check if sideport window already exists
+  let l:winnr = bufwinnr(l:bufnr)
+  if l:winnr > 0
+    " Sideport already visible, just switch to it briefly to ensure it's set up
+    execute l:winnr . 'wincmd w'
+  else
+    " Create vertical split on the left
+    execute 'topleft vertical ' . s:GetSideportWidth() . 'split'
+    execute 'buffer ' . l:bufnr
+  endif
 
   " Lock the window
   setlocal nomodifiable
@@ -74,11 +81,11 @@ function! Sideport_Show()
   setlocal signcolumn=no
   setlocal winfixwidth
 
-  " Prevent user from closing or navigating to sideport
+  " Prevent bare 'q' (often accidental), ZZ/ZQ to quit
+  " `:q` works via normal Ex command since game is inactive on between-level screens
   nnoremap <buffer> <silent> q <Nop>
-  nnoremap <buffer> <silent> :q <Nop>
-  nnoremap <buffer> <silent> ZZ <Nop>
-  nnoremap <buffer> <silent> ZQ <Nop>
+  nnoremap <buffer> <silent> ZZ :qa!<CR>
+  nnoremap <buffer> <silent> ZQ :qa!<CR>
 
   " Return focus to main window
   wincmd l

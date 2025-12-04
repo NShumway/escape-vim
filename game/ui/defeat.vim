@@ -1,0 +1,117 @@
+" DEFEAT Screen for Escape Vim
+" Full-screen defeat display (2 seconds)
+
+" ============================================================================
+" State
+" ============================================================================
+
+let s:defeat_bufnr = -1
+
+" Defeat banner (ASCII art)
+let s:defeat_banner = []
+call add(s:defeat_banner, '        ██████╗ ███████╗███████╗███████╗ █████╗ ████████╗███████╗██████╗ ')
+call add(s:defeat_banner, '        ██╔══██╗██╔════╝██╔════╝██╔════╝██╔══██╗╚══██╔══╝██╔════╝██╔══██╗')
+call add(s:defeat_banner, '        ██║  ██║█████╗  █████╗  █████╗  ███████║   ██║   █████╗  ██║  ██║')
+call add(s:defeat_banner, '        ██║  ██║██╔══╝  ██╔══╝  ██╔══╝  ██╔══██║   ██║   ██╔══╝  ██║  ██║')
+call add(s:defeat_banner, '        ██████╔╝███████╗██║     ███████╗██║  ██║   ██║   ███████╗██████╔╝')
+call add(s:defeat_banner, '        ╚═════╝ ╚══════╝╚═╝     ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═════╝ ')
+
+" ============================================================================
+" Buffer Management
+" ============================================================================
+
+function! s:GetBuffer()
+  if s:defeat_bufnr < 0 || !bufexists(s:defeat_bufnr)
+    let s:defeat_bufnr = bufadd('')
+    call bufload(s:defeat_bufnr)
+
+    call setbufvar(s:defeat_bufnr, '&buftype', 'nofile')
+    call setbufvar(s:defeat_bufnr, '&bufhidden', 'hide')
+    call setbufvar(s:defeat_bufnr, '&swapfile', 0)
+    call setbufvar(s:defeat_bufnr, '&buflisted', 0)
+  endif
+
+  return s:defeat_bufnr
+endfunction
+
+" ============================================================================
+" Rendering
+" ============================================================================
+
+" Generate the defeat screen content
+function! s:GenerateScreen(width, height)
+  " Initialize empty canvas
+  let l:canvas = []
+  for i in range(a:height)
+    call add(l:canvas, repeat(' ', a:width))
+  endfor
+
+  " Add defeat banner in center
+  let l:banner_y = (a:height / 2) - 3
+  for l:idx in range(len(s:defeat_banner))
+    let l:banner_line = s:defeat_banner[l:idx]
+    let l:banner_x = (a:width - len(l:banner_line)) / 2
+    if l:banner_x < 0
+      let l:banner_x = 0
+    endif
+    let l:y = l:banner_y + l:idx
+    if l:y >= 0 && l:y < a:height
+      let l:canvas[l:y] = strpart(repeat(' ', l:banner_x), 0, l:banner_x) . l:banner_line
+    endif
+  endfor
+
+  " Add subtitle below banner
+  let l:subtitle = 'You did not reach the exit...'
+  let l:sub_x = (a:width - len(l:subtitle)) / 2
+  let l:sub_y = l:banner_y + len(s:defeat_banner) + 2
+  if l:sub_y < a:height
+    let l:canvas[l:sub_y] = strpart(repeat(' ', l:sub_x), 0, l:sub_x) . l:subtitle
+  endif
+
+  return l:canvas
+endfunction
+
+" ============================================================================
+" Defeat Control
+" ============================================================================
+
+" Start the defeat screen
+function! Defeat_Start()
+  " Hide sideport for full-screen effect
+  call Sideport_Hide()
+
+  " Switch to defeat buffer
+  let l:bufnr = s:GetBuffer()
+  execute 'buffer ' . l:bufnr
+
+  " Generate and render content
+  let l:width = &columns
+  let l:height = &lines - 1  " Leave room for command line
+  let l:content = s:GenerateScreen(l:width, l:height)
+
+  call setbufvar(l:bufnr, '&modifiable', 1)
+  call deletebufline(l:bufnr, 1, '$')
+  call setbufline(l:bufnr, 1, l:content)
+  call setbufvar(l:bufnr, '&modifiable', 0)
+
+  " Configure display
+  setlocal nomodifiable
+  setlocal nonumber
+  setlocal norelativenumber
+  setlocal nocursorline
+  setlocal nocursorcolumn
+
+  " Block all input during display
+  nnoremap <buffer> <silent> <CR> <Nop>
+  nnoremap <buffer> <silent> j <Nop>
+  nnoremap <buffer> <silent> k <Nop>
+  nnoremap <buffer> <silent> h <Nop>
+  nnoremap <buffer> <silent> l <Nop>
+
+  redraw!
+endfunction
+
+" Stop the defeat screen (cleanup)
+function! Defeat_Stop()
+  " Nothing specific to clean up (no timers like fireworks)
+endfunction

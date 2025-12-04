@@ -5,7 +5,7 @@
 " State Management
 " ============================================================================
 
-" Current game state: 'LORE' | 'GAMEPLAY' | 'FIREWORKS' | 'RESULTS'
+" Current game state: 'LORE' | 'GAMEPLAY' | 'FIREWORKS' | 'RESULTS' | 'DEFEAT'
 let g:game_state = 'LORE'
 
 " Current level data
@@ -42,8 +42,13 @@ endfunction
 
 " Internal: Cleanup when leaving a state
 function! s:CleanupState(state)
-  if a:state == 'FIREWORKS'
+  if a:state == 'GAMEPLAY'
+    " Clear exit position so :q works normally on between-level screens
+    call gamesetexit(0, 0)
+  elseif a:state == 'FIREWORKS'
     call Fireworks_Stop()
+  elseif a:state == 'DEFEAT'
+    call Defeat_Stop()
   endif
 endfunction
 
@@ -59,6 +64,10 @@ function! s:EnterState(state)
     let s:transition_timer = timer_start(2000, {-> GameTransition('RESULTS')})
   elseif a:state == 'RESULTS'
     call Results_Render()
+  elseif a:state == 'DEFEAT'
+    call Defeat_Start()
+    " Auto-transition back to LORE after 2 seconds (retry level)
+    let s:transition_timer = timer_start(2000, {-> GameTransition('LORE')})
   endif
 endfunction
 
@@ -147,7 +156,7 @@ function! Game_Start()
   call GameTransition('LORE')
 endfunction
 
-" Called when player completes a level
+" Called when player completes a level (win conditions met)
 function! Game_LevelComplete()
   " Calculate and store final stats (so they don't keep ticking)
   let g:game_final_time = localtime() - g:game_start_time
@@ -158,6 +167,13 @@ function! Game_LevelComplete()
 
   " Transition to fireworks
   call GameTransition('FIREWORKS')
+endfunction
+
+" Called when player quits without meeting win conditions
+function! Game_LevelFailed()
+  " NO save, NO unlock, NO leaderboard
+  " Just transition to defeat screen (will auto-return to LORE)
+  call GameTransition('DEFEAT')
 endfunction
 
 " Called to advance to next level after results
