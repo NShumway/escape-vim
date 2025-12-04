@@ -5121,17 +5121,17 @@ intro_message(
     char	*p;
     static char	*(lines[]) =
     {
-	N_("VIM - Vi IMproved"),
+	N_("ESCAPE VIM - A game built on Vim"),
 	"",
 	N_("version "),
 	N_("by Bram Moolenaar et al."),
 #ifdef MODIFIED_BY
 	" ",
 #endif
-	N_("Vim is open source and freely distributable"),
+	N_("Modified for Escape Vim game"),
 	"",
-	N_("Help poor children in Uganda!"),
-	N_("type  :help Kuwasha<Enter>    for information "),
+	N_("Original Vim: vim.org"),
+	N_("type  :q<Enter>               to exit         "),
 	"",
 	N_("type  :q<Enter>               to exit         "),
 	N_("type  :help<Enter>  or  <F1>  for on-line help"),

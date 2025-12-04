@@ -106,6 +106,10 @@ function! s:RenderMainArea()
     call add(l:lines, '      Press <Enter> to begin')
   endif
   call add(l:lines, '')
+  call add(l:lines, '')
+  call add(l:lines, '')
+  call add(l:lines, '    ' . repeat('-', 42))
+  call add(l:lines, '    Built on Vim 9.1 by Bram Moolenaar | vim.org')
 
   " Set buffer content
   call setbufvar(l:bufnr, '&modifiable', 1)
