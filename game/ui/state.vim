@@ -75,24 +75,58 @@ endfunction
 " Level Management
 " ============================================================================
 
+" Quit the game with an error message visible to the user
+" @param message: Error message to display after quitting
+function! Game_QuitWithError(message)
+  " Clear the screen and show error
+  enew!
+  setlocal modifiable
+  setlocal buftype=nofile
+  call setline(1, '')
+  call setline(2, '  ERROR: ' . a:message)
+  call setline(3, '')
+  call setline(4, '  Press any key to exit...')
+  setlocal nomodifiable
+  redraw
+
+  " Wait for keypress then quit
+  call getchar()
+  qa!
+endfunction
+
 " Load level metadata without starting gameplay
 " @param level_id: numeric level ID
+" @return: 1 on success, 0 on failure (will quit with error)
 function! Game_LoadLevelMeta(level_id)
   let g:current_level_id = a:level_id
 
   " Read manifest to find level directory
   let l:manifest = eval(join(readfile('levels/manifest.vim'), ''))
 
+  let l:found = 0
   for l:entry in l:manifest
     if l:entry.id == a:level_id
       let g:current_level_path = 'levels/' . l:entry.dir
+      let l:found = 1
       break
     endif
   endfor
 
+  if !l:found
+    call Game_QuitWithError("Level '" . a:level_id . "' not found in manifest")
+    return 0
+  endif
+
   " Load the metadata
   let l:meta_path = g:current_level_path . '/meta.vim'
+
+  if !filereadable(l:meta_path)
+    call Game_QuitWithError("Level metadata not found: " . l:meta_path)
+    return 0
+  endif
+
   let g:current_level_meta = eval(join(readfile(l:meta_path), ''))
+  return 1
 endfunction
 
 " Get cumulative commands from all completed levels + current
