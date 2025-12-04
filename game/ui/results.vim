@@ -22,16 +22,7 @@ call add(s:mock_leaderboard, {'name': 'nostruggle', 'time': 105, 'moves': 51})
 " ============================================================================
 
 function! s:GetBuffer()
-  if s:results_bufnr < 0 || !bufexists(s:results_bufnr)
-    let s:results_bufnr = bufadd('')
-    call bufload(s:results_bufnr)
-
-    call setbufvar(s:results_bufnr, '&buftype', 'nofile')
-    call setbufvar(s:results_bufnr, '&bufhidden', 'hide')
-    call setbufvar(s:results_bufnr, '&swapfile', 0)
-    call setbufvar(s:results_bufnr, '&buflisted', 0)
-  endif
-
+  let s:results_bufnr = Util_GetScratchBuffer(s:results_bufnr)
   return s:results_bufnr
 endfunction
 
@@ -65,7 +56,7 @@ function! s:RenderMainArea()
   " Get player's final stats (stored at level completion, not live)
   let l:elapsed = g:game_final_time
   let l:moves = g:game_final_moves
-  let l:time_str = s:FormatTime(l:elapsed)
+  let l:time_str = Util_FormatTime(l:elapsed)
 
   " Top area with subtle animated stars
   call add(l:lines, '')
@@ -101,7 +92,7 @@ function! s:RenderMainArea()
   let l:board = s:GetLeaderboardWithPlayer(l:elapsed, l:moves)
   let l:rank = 1
   for l:entry in l:board[:4]  " Top 5
-    let l:time_fmt = s:FormatTime(l:entry.time)
+    let l:time_fmt = Util_FormatTime(l:entry.time)
     let l:name = printf('%-15s', l:entry.name)
     let l:is_you = (l:entry.name == 'YOU')
     let l:prefix = l:is_you ? '  >>  ' : '      '
@@ -160,12 +151,6 @@ function! s:GetLeaderboardWithPlayer(time, moves)
   return l:board
 endfunction
 
-" Format time as MM:SS
-function! s:FormatTime(seconds)
-  let l:mins = a:seconds / 60
-  let l:secs = a:seconds % 60
-  return printf('%02d:%02d', l:mins, l:secs)
-endfunction
 
 " ============================================================================
 " Animation

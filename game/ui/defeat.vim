@@ -21,16 +21,7 @@ call add(s:defeat_banner, '        ╚═════╝ ╚══════�
 " ============================================================================
 
 function! s:GetBuffer()
-  if s:defeat_bufnr < 0 || !bufexists(s:defeat_bufnr)
-    let s:defeat_bufnr = bufadd('')
-    call bufload(s:defeat_bufnr)
-
-    call setbufvar(s:defeat_bufnr, '&buftype', 'nofile')
-    call setbufvar(s:defeat_bufnr, '&bufhidden', 'hide')
-    call setbufvar(s:defeat_bufnr, '&swapfile', 0)
-    call setbufvar(s:defeat_bufnr, '&buflisted', 0)
-  endif
-
+  let s:defeat_bufnr = Util_GetScratchBuffer(s:defeat_bufnr)
   return s:defeat_bufnr
 endfunction
 

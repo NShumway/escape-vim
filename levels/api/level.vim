@@ -12,6 +12,7 @@ function! Level_Load(level_path)
   let s:level_path = a:level_path
 
   " 1. Load APIs (order matters - position first, others depend on it)
+  source levels/api/util.vim
   source levels/api/position.vim
   source levels/api/buffer.vim
   source levels/api/highlight.vim

@@ -124,16 +124,7 @@ endfunction
 " ============================================================================
 
 function! s:GetBuffer()
-  if s:firework_bufnr < 0 || !bufexists(s:firework_bufnr)
-    let s:firework_bufnr = bufadd('')
-    call bufload(s:firework_bufnr)
-
-    call setbufvar(s:firework_bufnr, '&buftype', 'nofile')
-    call setbufvar(s:firework_bufnr, '&bufhidden', 'hide')
-    call setbufvar(s:firework_bufnr, '&swapfile', 0)
-    call setbufvar(s:firework_bufnr, '&buflisted', 0)
-  endif
-
+  let s:firework_bufnr = Util_GetScratchBuffer(s:firework_bufnr)
   return s:firework_bufnr
 endfunction
 

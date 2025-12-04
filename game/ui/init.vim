@@ -11,6 +11,7 @@ let g:viewport_disable_resize = 1
 " Load Level API (needed for gameplay)
 " ============================================================================
 
+source levels/api/util.vim
 source levels/api/level.vim
 
 " ============================================================================

@@ -37,18 +37,7 @@ endfunction
 " Create or get the sideport buffer
 " @return: buffer number
 function! Sideport_GetBuffer()
-  if s:sideport_bufnr < 0 || !bufexists(s:sideport_bufnr)
-    " Create new buffer
-    let s:sideport_bufnr = bufadd('')
-    call bufload(s:sideport_bufnr)
-
-    " Set buffer options
-    call setbufvar(s:sideport_bufnr, '&buftype', 'nofile')
-    call setbufvar(s:sideport_bufnr, '&bufhidden', 'hide')
-    call setbufvar(s:sideport_bufnr, '&swapfile', 0)
-    call setbufvar(s:sideport_bufnr, '&buflisted', 0)
-  endif
-
+  let s:sideport_bufnr = Util_GetScratchBuffer(s:sideport_bufnr)
   return s:sideport_bufnr
 endfunction
 
@@ -268,7 +257,7 @@ function! s:UpdateTimer(timer)
   endif
 
   let l:elapsed = localtime() - g:game_start_time
-  let l:time_str = s:FormatTime(l:elapsed)
+  let l:time_str = Util_FormatTime(l:elapsed)
 
   " Re-render the gameplay sideport
   let l:meta = g:current_level_meta
@@ -283,9 +272,3 @@ function! s:UpdateTimer(timer)
         \ )
 endfunction
 
-" Format seconds as MM:SS
-function! s:FormatTime(seconds)
-  let l:mins = a:seconds / 60
-  let l:secs = a:seconds % 60
-  return printf('%02d:%02d', l:mins, l:secs)
-endfunction

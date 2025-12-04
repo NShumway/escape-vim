@@ -15,16 +15,7 @@ let s:lore_bufnr = -1
 
 " Create or get the lore buffer
 function! s:GetBuffer()
-  if s:lore_bufnr < 0 || !bufexists(s:lore_bufnr)
-    let s:lore_bufnr = bufadd('')
-    call bufload(s:lore_bufnr)
-
-    call setbufvar(s:lore_bufnr, '&buftype', 'nofile')
-    call setbufvar(s:lore_bufnr, '&bufhidden', 'hide')
-    call setbufvar(s:lore_bufnr, '&swapfile', 0)
-    call setbufvar(s:lore_bufnr, '&buflisted', 0)
-  endif
-
+  let s:lore_bufnr = Util_GetScratchBuffer(s:lore_bufnr)
   return s:lore_bufnr
 endfunction
 
