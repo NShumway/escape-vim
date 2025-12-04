@@ -295,12 +295,12 @@ This keeps fireworks art centralized, not duplicated per level.
 ### Location
 
 ```
-~/.escape-vim/
+~/Library/Application Support/EscapeVim/
 ├── save.vim                # Progress and stats
 ```
 
-Why `~/.escape-vim/`:
-- Standard user data location
+Why `~/Library/Application Support/EscapeVim/`:
+- Standard macOS location for application data
 - Works when game is installed as package
 - Simple to find/backup/delete
 
@@ -461,7 +461,7 @@ assets/mockups/
 - ✓ Sideport layout variations (3 modes defined)
 - ✓ Lore storage (separate lore.txt per level)
 - ✓ Fireworks storage (centralized in assets/, not per-level)
-- ✓ Save file location (~/.escape-vim/)
+- ✓ Save file location (~/Library/Application Support/EscapeVim/)
 - ✓ Commander quote on launch screen (yes, in sideport)
 
 ### Remaining
@@ -473,4 +473,4 @@ assets/mockups/
 
 ## 13. Summary
 
-The UI flow consists of four screens (LORE → GAMEPLAY → FIREWORKS → RESULTS → LORE) with a persistent sideport showing the Commander and contextual information. Level data is stored in per-level directories with `lore.txt` and `meta.vim` files. Save data persists to `~/.escape-vim/save.vim` on level completion only. Fireworks assets are centralized to avoid duplication, with a special variant for the final level.
+The UI flow consists of four screens (LORE → GAMEPLAY → FIREWORKS → RESULTS → LORE) with a persistent sideport showing the Commander and contextual information. Level data is stored in per-level directories with `lore.txt` and `meta.vim` files. Save data persists to `~/Library/Application Support/EscapeVim/save.vim` on level completion only. Fireworks assets are centralized to avoid duplication, with a special variant for the final level.

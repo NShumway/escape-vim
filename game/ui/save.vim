@@ -1,11 +1,12 @@
 " Save/Load System for Escape Vim
-" Persists game progress to ~/.escape-vim/save.vim
+" Persists game progress to ~/Library/Application Support/EscapeVim/save.vim
 
 " ============================================================================
 " Configuration
 " ============================================================================
 
-let s:save_dir = expand('~/.escape-vim')
+" macOS standard location for application data
+let s:save_dir = expand('~/Library/Application Support/EscapeVim')
 let s:save_file = s:save_dir . '/save.vim'
 
 " ============================================================================
