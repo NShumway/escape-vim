@@ -193,13 +193,8 @@ endfunction
 " ============================================================================
 
 function! s:SetupInput()
-  " Any key to continue
+  " Enter to continue
   nnoremap <buffer> <silent> <CR> :call <SID>Continue()<CR>
-  nnoremap <buffer> <silent> <Space> :call <SID>Continue()<CR>
-  nnoremap <buffer> <silent> j :call <SID>Continue()<CR>
-  nnoremap <buffer> <silent> k :call <SID>Continue()<CR>
-  nnoremap <buffer> <silent> l :call <SID>Continue()<CR>
-  nnoremap <buffer> <silent> h :call <SID>Continue()<CR>
 
   " ZZ/ZQ to quit (`:q` works via normal Ex command since game is inactive)
   nnoremap <buffer> <silent> ZZ :qa!<CR>

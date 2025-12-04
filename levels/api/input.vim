@@ -52,11 +52,8 @@ endfunction
 " @param category: category name for the block message
 function! Input_BlockKeys(keys, category)
   for l:key in a:keys
-    " Need to escape special characters for the mapping
-    let l:escaped_key = escape(l:key, '"')
-    let l:escaped_cat = escape(a:category, '"')
-    execute 'nnoremap <buffer> <silent> ' . l:key .
-          \ ' :call <SID>OnBlocked("' . l:escaped_key . '", "' . l:escaped_cat . '")<CR>'
+    " Map to <Nop> for silent blocking - no command line output
+    execute 'nnoremap <buffer> <silent> ' . l:key . ' <Nop>'
   endfor
 endfunction
 

@@ -109,7 +109,11 @@ function! s:RenderMainArea()
   endfor
 
   call add(l:lines, '')
-  call add(l:lines, '      Press <Enter> to begin')
+  if len(s:unlocked_levels) > 1
+    call add(l:lines, '      j/k to select level, <Enter> to begin')
+  else
+    call add(l:lines, '      Press <Enter> to begin')
+  endif
   call add(l:lines, '')
 
   " Set buffer content

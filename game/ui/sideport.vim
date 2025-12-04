@@ -232,7 +232,7 @@ function! Sideport_RenderResults(victory_quote)
   " Separator
   call add(l:lines, repeat('─', s:GetSideportWidth()))
   call add(l:lines, '')
-  call add(l:lines, '         Press any key to continue')
+  call add(l:lines, '         Press <Enter> to continue')
   call add(l:lines, '')
 
   call Sideport_SetContent(l:lines)
