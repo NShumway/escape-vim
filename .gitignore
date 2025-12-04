@@ -1,3 +1,6 @@
+# Claude Code working directory
+.claude/
+
 # Unixen: object and executable files.
 *.o
 src/vim

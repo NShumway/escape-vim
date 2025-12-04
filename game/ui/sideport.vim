@@ -1,0 +1,284 @@
+" Sideport Rendering for Escape Vim
+" Handles the left panel with Commander portrait and contextual info
+
+" ============================================================================
+" Configuration
+" ============================================================================
+
+" Sideport dimensions (~45% of screen width, min 44)
+let s:sideport_bufnr = -1
+
+function! s:GetSideportWidth()
+  let l:width = float2nr(&columns * 0.45)
+  return max([l:width, 44])
+endfunction
+
+" Commander portrait (loaded from file)
+let s:commander_portrait = []
+
+" ============================================================================
+" Portrait Loading
+" ============================================================================
+
+" Load the Commander portrait from file
+function! s:LoadPortrait()
+  let l:path = 'assets/commander.txt'
+  if filereadable(l:path)
+    let s:commander_portrait = readfile(l:path)
+  else
+    let s:commander_portrait = ['[Commander Portrait Not Found]']
+  endif
+endfunction
+
+" ============================================================================
+" Buffer Management
+" ============================================================================
+
+" Create or get the sideport buffer
+" @return: buffer number
+function! Sideport_GetBuffer()
+  if s:sideport_bufnr < 0 || !bufexists(s:sideport_bufnr)
+    " Create new buffer
+    let s:sideport_bufnr = bufadd('')
+    call bufload(s:sideport_bufnr)
+
+    " Set buffer options
+    call setbufvar(s:sideport_bufnr, '&buftype', 'nofile')
+    call setbufvar(s:sideport_bufnr, '&bufhidden', 'hide')
+    call setbufvar(s:sideport_bufnr, '&swapfile', 0)
+    call setbufvar(s:sideport_bufnr, '&buflisted', 0)
+  endif
+
+  return s:sideport_bufnr
+endfunction
+
+" Show the sideport as a vertical split
+function! Sideport_Show()
+  " Load portrait if not loaded
+  if empty(s:commander_portrait)
+    call s:LoadPortrait()
+  endif
+
+  let l:bufnr = Sideport_GetBuffer()
+
+  " Create vertical split on the left
+  execute 'topleft vertical ' . s:GetSideportWidth() . 'split'
+  execute 'buffer ' . l:bufnr
+
+  " Lock the window
+  setlocal nomodifiable
+  setlocal nonumber
+  setlocal norelativenumber
+  setlocal nocursorline
+  setlocal nocursorcolumn
+  setlocal signcolumn=no
+  setlocal winfixwidth
+
+  " Prevent user from closing or navigating to sideport
+  nnoremap <buffer> <silent> q <Nop>
+  nnoremap <buffer> <silent> :q <Nop>
+  nnoremap <buffer> <silent> ZZ <Nop>
+  nnoremap <buffer> <silent> ZQ <Nop>
+
+  " Return focus to main window
+  wincmd l
+endfunction
+
+" Hide the sideport (for full-screen modes like FIREWORKS)
+function! Sideport_Hide()
+  let l:winnr = bufwinnr(s:sideport_bufnr)
+  if l:winnr > 0
+    execute l:winnr . 'wincmd w'
+    close
+  endif
+endfunction
+
+" ============================================================================
+" Content Rendering
+" ============================================================================
+
+" Clear and set sideport content
+" @param lines: list of strings to display
+function! Sideport_SetContent(lines)
+  let l:bufnr = Sideport_GetBuffer()
+
+  call setbufvar(l:bufnr, '&modifiable', 1)
+  call deletebufline(l:bufnr, 1, '$')
+  call setbufline(l:bufnr, 1, a:lines)
+  call setbufvar(l:bufnr, '&modifiable', 0)
+endfunction
+
+" ============================================================================
+" Rendering Modes
+" ============================================================================
+
+" Render Mode 1: LORE (portrait + quote only)
+" @param quote: commander quote string (can contain \n)
+function! Sideport_RenderLore(quote)
+  let l:lines = []
+
+  " Add portrait
+  let l:lines += s:commander_portrait
+
+  " Add title
+  call add(l:lines, '')
+  call add(l:lines, '        T H E   C O M M A N D E R')
+  call add(l:lines, '')
+
+  " Add separator
+  call add(l:lines, repeat('─', s:GetSideportWidth()))
+  call add(l:lines, '')
+
+  " Add quote (split on newlines)
+  let l:quote_lines = split(a:quote, '\n')
+  for l:line in l:quote_lines
+    call add(l:lines, '  ' . l:line)
+  endfor
+  call add(l:lines, '')
+  call add(l:lines, '                     — The Commander')
+  call add(l:lines, '')
+
+  call Sideport_SetContent(l:lines)
+endfunction
+
+" Render Mode 2: GAMEPLAY (full info panel)
+" @param level_num: level number
+" @param level_title: level title string
+" @param objective: objective text
+" @param commands: list of command dictionaries
+" @param time_str: formatted time string (e.g., "00:00")
+" @param moves: move count
+function! Sideport_RenderGameplay(level_num, level_title, objective, commands, time_str, moves)
+  let l:lines = []
+
+  " Add portrait
+  let l:lines += s:commander_portrait
+
+  " Add title
+  call add(l:lines, '')
+  call add(l:lines, '        T H E   C O M M A N D E R')
+  call add(l:lines, '')
+
+  " Separator
+  call add(l:lines, repeat('─', s:GetSideportWidth()))
+
+  " Level info
+  call add(l:lines, '  LEVEL ' . a:level_num . ': ' . a:level_title)
+  call add(l:lines, '')
+
+  " Objective
+  call add(l:lines, '  OBJECTIVE')
+  call add(l:lines, '  ' . a:objective)
+  call add(l:lines, '')
+
+  " Separator
+  call add(l:lines, repeat('─', s:GetSideportWidth()))
+
+  " Commands
+  call add(l:lines, '  COMMANDS')
+  call add(l:lines, '  ' . repeat('─', 8))
+
+  for l:cmd in a:commands
+    let l:key_padded = printf('%-4s', l:cmd.key)
+    call add(l:lines, '  ' . l:key_padded . l:cmd.desc)
+  endfor
+
+  call add(l:lines, '')
+
+  " Separator
+  call add(l:lines, repeat('─', s:GetSideportWidth()))
+
+  " Timer and moves
+  call add(l:lines, '')
+  call add(l:lines, '  TIME      ' . a:time_str . '        MOVES  ' . a:moves)
+  call add(l:lines, '')
+
+  call Sideport_SetContent(l:lines)
+endfunction
+
+" Render Mode 3: RESULTS (portrait + victory quote)
+" @param victory_quote: commander victory quote string
+function! Sideport_RenderResults(victory_quote)
+  let l:lines = []
+
+  " Add portrait
+  let l:lines += s:commander_portrait
+
+  " Add title
+  call add(l:lines, '')
+  call add(l:lines, '        T H E   C O M M A N D E R')
+  call add(l:lines, '')
+
+  " Add separator
+  call add(l:lines, repeat('─', s:GetSideportWidth()))
+  call add(l:lines, '')
+
+  " Add victory quote (split on newlines)
+  let l:quote_lines = split(a:victory_quote, '\n')
+  for l:line in l:quote_lines
+    call add(l:lines, '  ' . l:line)
+  endfor
+  call add(l:lines, '')
+  call add(l:lines, '                     — The Commander')
+  call add(l:lines, '')
+
+  " Separator
+  call add(l:lines, repeat('─', s:GetSideportWidth()))
+  call add(l:lines, '')
+  call add(l:lines, '         Press any key to continue')
+  call add(l:lines, '')
+
+  call Sideport_SetContent(l:lines)
+endfunction
+
+" ============================================================================
+" Timer Update (for gameplay)
+" ============================================================================
+
+let s:timer_update_id = -1
+
+" Start the timer update loop
+function! Sideport_StartTimer()
+  if s:timer_update_id >= 0
+    call timer_stop(s:timer_update_id)
+  endif
+  let s:timer_update_id = timer_start(1000, function('s:UpdateTimer'), {'repeat': -1})
+endfunction
+
+" Stop the timer update loop
+function! Sideport_StopTimer()
+  if s:timer_update_id >= 0
+    call timer_stop(s:timer_update_id)
+    let s:timer_update_id = -1
+  endif
+endfunction
+
+" Internal: Update timer display
+function! s:UpdateTimer(timer)
+  if g:game_state != 'GAMEPLAY'
+    call Sideport_StopTimer()
+    return
+  endif
+
+  let l:elapsed = localtime() - g:game_start_time
+  let l:time_str = s:FormatTime(l:elapsed)
+
+  " Re-render the gameplay sideport
+  let l:meta = g:current_level_meta
+  let l:commands = Game_GetAllCommands()
+  call Sideport_RenderGameplay(
+        \ g:current_level_id,
+        \ get(l:meta, 'title', 'Unknown'),
+        \ get(l:meta, 'objective', ''),
+        \ l:commands,
+        \ l:time_str,
+        \ g:game_move_count
+        \ )
+endfunction
+
+" Format seconds as MM:SS
+function! s:FormatTime(seconds)
+  let l:mins = a:seconds / 60
+  let l:secs = a:seconds % 60
+  return printf('%02d:%02d', l:mins, l:secs)
+endfunction

@@ -1,0 +1,21 @@
+"Soldier. You've been trapped inside
+ the VIM editor. Many have entered.
+ Few have escaped.
+
+ I've seen recruits freeze at the
+ sight of that blinking cursor. Watched
+ them mash Escape until their fingers
+ went numb. Some are still in there,
+ typing :quit over and over, hoping
+ something will change.
+
+ But you're different. I can see it.
+
+ Your mission: learn the ancient
+ commands that will set you free.
+ Move with purpose. Act with precision.
+ And whatever you do...
+
+ Don't panic."
+
+                    — The Commander

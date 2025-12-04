@@ -6106,9 +6106,17 @@ ex_quit(exarg_T *eap)
 {
     win_T	*wp;
 
-    // Escape Room: Vim - block quit if game is active and not at exit
-    if (game_is_active() && !game_check_quit_allowed())
+    // Escape Room: Vim - handle game quit
+    if (game_is_active())
+    {
+	if (!game_check_quit_allowed())
+	    return;  // Not at exit, block quit
+	// At exit - trigger User GameLevelComplete event and return
+	// Don't actually quit; let Vimscript handle the level transition
+	apply_autocmds(EVENT_USER, (char_u *)"GameLevelComplete",
+		       curbuf->b_fname, TRUE, curbuf);
 	return;
+    }
 
     if (cmdwin_type != 0)
     {
@@ -6222,9 +6230,15 @@ before_quit_all(exarg_T *eap)
     static void
 ex_quit_all(exarg_T *eap)
 {
-    // Escape Room: Vim - block quit if game is active and not at exit
-    if (game_is_active() && !game_check_quit_allowed())
+    // Escape Room: Vim - handle game quit
+    if (game_is_active())
+    {
+	if (!game_check_quit_allowed())
+	    return;  // Not at exit, block quit
+	apply_autocmds(EVENT_USER, (char_u *)"GameLevelComplete",
+		       curbuf->b_fname, TRUE, curbuf);
 	return;
+    }
 
     if (before_quit_all(eap) == FAIL)
 	return;
@@ -6715,9 +6729,15 @@ ex_stop(exarg_T *eap)
     static void
 ex_exit(exarg_T *eap)
 {
-    // Escape Room: Vim - block quit if game is active and not at exit
-    if (game_is_active() && !game_check_quit_allowed())
+    // Escape Room: Vim - handle game quit
+    if (game_is_active())
+    {
+	if (!game_check_quit_allowed())
+	    return;  // Not at exit, block quit
+	apply_autocmds(EVENT_USER, (char_u *)"GameLevelComplete",
+		       curbuf->b_fname, TRUE, curbuf);
 	return;
+    }
 
 #ifdef FEAT_EVAL
     if (not_in_vim9(eap) == FAIL)
