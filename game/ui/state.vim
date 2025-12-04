@@ -41,6 +41,12 @@ endfunction
 " Transition to a new game state
 " @param new_state: 'LORE' | 'GAMEPLAY' | 'FIREWORKS' | 'RESULTS'
 function! GameTransition(new_state)
+  " Stop any pending transition timer to prevent race conditions
+  if s:transition_timer >= 0
+    call timer_stop(s:transition_timer)
+    let s:transition_timer = -1
+  endif
+
   let l:old_state = g:game_state
   let g:game_state = a:new_state
 
