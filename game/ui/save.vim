@@ -29,7 +29,7 @@ function! Save_Load()
 
   try
     let l:content = join(readfile(s:save_file), '')
-    let l:data = eval(l:content)
+    let l:data = json_decode(l:content)
     return l:data
   catch
     " Corrupted save file - return default
@@ -45,8 +45,8 @@ function! Save_Write(data)
     call mkdir(s:save_dir, 'p')
   endif
 
-  " Format the save data
-  let l:lines = [string(a:data)]
+  " Format the save data as JSON
+  let l:lines = [json_encode(a:data)]
   call writefile(l:lines, s:save_file)
 endfunction
 
