@@ -1,0 +1,49 @@
+SCREEN 3a: Victory Fireworks (full-screen animation)
+=====================================================
+
+~2 second animation, 4-6 frames cycling fireworks bursts
+"VICTORY!" text stays stable, fireworks/stars animate around it
+
+FRAME 1:
+
+
+            *                                           *
+                      *                                              *
+                              *   *
+       \   /                        \   /                      *              \   /
+        \ /      *                   \ /                                       \ /
+    ─────*─────               ────────*────────        *                  ──────*──────
+        /|\                         /|\                                       /|\
+       / | \             *         / | \                                     / | \
+         |                           |             \   /            *          |
+                  *                               ──*──
+                                                   /|\                   *
+     *                    *                       / | \                              *
+                                     *
+              *                                              *
+
+        ██╗   ██╗██╗ ██████╗████████╗ ██████╗ ██████╗ ██╗   ██╗██╗
+        ██║   ██║██║██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗╚██╗ ██╔╝██║
+        ██║   ██║██║██║        ██║   ██║   ██║██████╔╝ ╚████╔╝ ██║
+        ╚██╗ ██╔╝██║██║        ██║   ██║   ██║██╔══██╗  ╚██╔╝  ╚═╝
+         ╚████╔╝ ██║╚██████╗   ██║   ╚██████╔╝██║  ██║   ██║   ██╗
+          ╚═══╝  ╚═╝ ╚═════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝
+
+
+                *                                                      *
+                          *                  *
+      *                          *                        *                      *
+                    *                             *
+                                       *                        *
+           *                                           *
+                         *        *                                      *
+                                                 *
+
+
+ANIMATION NOTES:
+- Fireworks burst at random positions each frame
+- Stars (*) twinkle on/off
+- "VICTORY!" banner stays centered and stable
+- Total duration: ~2 seconds
+- Frame rate: ~3-4 fps (4-6 total frames)
+- After animation completes, transition to Screen 3b (results)

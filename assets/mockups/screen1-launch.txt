@@ -1,0 +1,56 @@
+SCREEN 1: Launch / Lore + Level Select
+=======================================
+
+┌────────────────────────────────────────────┬─────────────────────────────────────────────┐
+│                                            │                                             │
+│             @@@@@@@=                       │                                             │
+│         %@@@@@=.   @@@@.                   │    ══════════════════════════════════════   │
+│       -@%-:--.#@-    .%@@.                 │                                             │
+│      +@%@@.*@.    .@@@@@@ @@.              │    "Soldier. You've been trapped inside     │
+│     @@@@@@@@#@@@@@@@@@#  . %@   .          │     the VIM editor. Many have entered.      │
+│     @@+.    .@@@.        *@@@. .           │     Few have escaped.                       │
+│     @@.                    .@=             │                                             │
+│     @@@ @ @%..       .. +  @@...           │     I've seen recruits freeze at the        │
+│      @@  =.    :..      = +@@              │     sight of that blinking cursor. Watched  │
+│      @                     @@ =            │     them mash Escape until their fingers    │
+│    -@@. @@@@*. -==:. .@@@@ # @+..          │     went numb. Some are still in there,     │
+│     @@ +@@@@@@@@# @@@@@@@= @  :            │     typing :quit over and over, hoping      │
+│     *@    . .+%@  :==      . @:            │     something will change.                  │
+│     .@@@-      +@ .  ..   @ #+   .         │                                             │
+│        .@@+   @@       :@@@@@.             │     But you're different. I can see it.     │
+│        @#@@--  :   . .  +@=@  #            │                                             │
+│        @=@.   @@@@@     . %:               │     Your mission: learn the ancient         │
+│    .+-:@.:*%@@ =    *@*   @:.-             │     commands that will set you free.        │
+│  .-*-+@@@=%%  .    %     @+.               │     Move with purpose. Act with precision.  │
+│    . @%+@@%@@@@@@#..   @.@.**:             │     And whatever you do...                  │
+│  @%+@@**-@@@=        @@ *@.#@. .           │                                             │
+│:@%: @@ =#@+@@@@@@@@@@*  :@ . @%:           │     Don't panic."                           │
+│ @@@@@%-%+@@+#@@@@%@%.- .@+   ..@@@@@.      │                                             │
+│      =@@  .:+.@@@@*.  :@@  *#              │                        — The Commander      │
+│       =%@. .%.   :=@@@@@  %                │                                             │
+│        %*@#*  :@@@% @%.    @@              │    ══════════════════════════════════════   │
+│       . @ -  @@@:.-+@ @@@@                 │                                             │
+│          +*@@@.    @@@@@@@@@@.             │                                             │
+│        . =@      .@@:   -                  │    > LEVEL 1: First Steps                   │
+│                 .:@@                       │                                             │
+│                                            │      Press <Enter> to begin                 │
+│        T H E   C O M M A N D E R           │                                             │
+│                                            │                                             │
+├────────────────────────────────────────────┤                                             │
+│                                            │                                             │
+│  "Every expert was once a beginner.        │                                             │
+│   Every master was once a disaster.        │                                             │
+│                                            │                                             │
+│   Today, you take your first steps."       │                                             │
+│                                            │                                             │
+│                     — The Commander        │                                             │
+│                                            │                                             │
+└────────────────────────────────────────────┴─────────────────────────────────────────────┘
+
+NOTES:
+- Commander portrait in upper left
+- Level lore text in main area (right side) - changes per level
+- Commander quote in lower left sideport - changes per level
+- Level selector with ">" cursor
+- j/k to navigate levels (when multiple unlocked)
+- <Enter> to start selected level

@@ -1,0 +1,57 @@
+SCREEN 4: Level 2 Lore / Level Select
+======================================
+
+┌────────────────────────────────────────────┬─────────────────────────────────────────────┐
+│                                            │                                             │
+│             @@@@@@@=                       │                                             │
+│         %@@@@@=.   @@@@.                   │    ══════════════════════════════════════   │
+│       -@%-:--.#@-    .%@@.                 │                                             │
+│      +@%@@.*@.    .@@@@@@ @@.              │    "You've learned to walk, soldier.        │
+│     @@@@@@@@#@@@@@@@@@#  . %@   .          │     Now it's time to learn to run.          │
+│     @@+.    .@@@.        *@@@. .           │                                             │
+│     @@.                    .@=             │     In VIM, moving one step at a time       │
+│     @@@ @ @%..       .. +  @@...           │     will get you killed. The masters        │
+│      @@  =.    :..      = +@@              │     move in leaps — word by word,           │
+│      @                     @@ =            │     line by line.                           │
+│    -@@. @@@@*. -==:. .@@@@ # @+..          │                                             │
+│     @@ +@@@@@@@@# @@@@@@@= @  :            │     w moves you forward. b moves you        │
+│     *@    . .+%@  :==      . @:            │     back. Simple as that.                   │
+│     .@@@-      +@ .  ..   @ #+   .         │                                             │
+│        .@@+   @@       :@@@@@.             │     But simple doesn't mean easy.           │
+│        @#@@--  :   . .  +@=@  #            │     This maze was built for speed.          │
+│        @=@.   @@@@@     . %:               │     One wrong word-jump and you'll          │
+│    .+-:@.:*%@@ =    *@*   @:.-             │     find yourself back at the start.        │
+│  .-*-+@@@=%%  .    %     @+.               │                                             │
+│    . @%+@@%@@@@@@#..   @.@.**:             │     Show me what you've got."               │
+│  @%+@@**-@@@=        @@ *@.#@. .           │                                             │
+│:@%: @@ =#@+@@@@@@@@@@*  :@ . @%:           │                        — The Commander      │
+│ @@@@@%-%+@@+#@@@@%@%.- .@+   ..@@@@@.      │                                             │
+│      =@@  .:+.@@@@*.  :@@  *#              │    ══════════════════════════════════════   │
+│       =%@. .%.   :=@@@@@  %                │                                             │
+│        %*@#*  :@@@% @%.    @@              │                                             │
+│       . @ -  @@@:.-+@ @@@@                 │      LEVEL 1: First Steps            ✓      │
+│          +*@@@.    @@@@@@@@@@.             │    > LEVEL 2: Word by Word                  │
+│        . =@      .@@:   -                  │                                             │
+│                 .:@@                       │      Press <Enter> to begin                 │
+│                                            │                                             │
+│        T H E   C O M M A N D E R           │                                             │
+│                                            │                                             │
+├────────────────────────────────────────────┤                                             │
+│                                            │                                             │
+│  "Speed is nothing without control.        │                                             │
+│   Control is nothing without speed.        │                                             │
+│                                            │                                             │
+│   Master both, and you master VIM."        │                                             │
+│                                            │                                             │
+│                     — The Commander        │                                             │
+│                                            │                                             │
+└────────────────────────────────────────────┴─────────────────────────────────────────────┘
+
+NOTES:
+- Same layout as Screen 1 (launch/lore)
+- Level 1 now shows checkmark (✓) indicating completion
+- Level 2 highlighted with ">" cursor
+- Lore text in main area changes to Level 2's lore
+- Commander quote in sideport changes to Level 2's quote
+- User can navigate level select with j/k if multiple levels unlocked
+- Press <Enter> to start selected level
