@@ -147,7 +147,7 @@ Quit commands are intercepted at the C level in `ex_docmd.c` for reliable covera
 - `ZZ`, `ZQ` (handled via normal mode mapping calling a game function)
 
 **Behavior:**
-- Level init calls `GameSetExit(row, col)` to set exit coordinates
+- Level init calls `gamesetexit(row, col)` to set exit coordinates
 - Hook calls `game_check_quit_allowed()` in `game/game.c`
 - Game checks if cursor is at the exit coordinates
 - If yes: return true, vim exits normally
@@ -366,14 +366,14 @@ Register `game_set_exit` as a vim function so level init can call it:
 
 ```c
 // In game initialization (or vim's function registration)
-// Registers GameSetExit(row, col) as a callable Vimscript function
+// Registers gamesetexit(row, col) as a callable Vimscript function
 ```
 
 **Level init calls:**
 
 ```vim
 " In init.vim
-call GameSetExit(10, 26)  " Row 10, column 26 (where Q is in the maze)
+call gamesetexit(10, 26)  " Row 10, column 26 (where Q is in the maze)
 ```
 
 **Hook in `src/ex_docmd.c`**
@@ -399,7 +399,7 @@ nnoremap ZZ :call <SID>GameTryQuit()<CR>
 nnoremap ZQ :call <SID>GameTryQuit()<CR>
 
 function! s:GameTryQuit()
-  " Check if at exit position (must match what was passed to GameSetExit)
+  " Check if at exit position (must match what was passed to gamesetexit)
   if line('.') == 10 && col('.') == 26
     quit!
   endif
