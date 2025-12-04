@@ -16,10 +16,11 @@
 
 /*
  * Escape Room: Vim - intercept quit commands during gameplay.
- * Returns 1 if the game handled the quit (caller should return).
- * Returns 0 if normal Vim quit logic should proceed (never happens in game).
+ * When a game is active, fires win/fail events instead of quitting.
+ * When between levels (no active game), exits Vim entirely.
+ * This function never returns to allow normal Vim quit logic.
  */
-    static int
+    static void
 game_intercept_quit(void)
 {
     if (game_is_active())
@@ -31,12 +32,11 @@ game_intercept_quit(void)
 	else
 	    apply_autocmds(EVENT_USER, (char_u *)"GameLevelFailed",
 			   curbuf->b_fname, TRUE, curbuf);
-	return 1;
+	return;
     }
 
-    // Between levels - quit entirely
+    // Between levels - quit entirely (getout never returns)
     getout(0);
-    return 1;
 }
 
 static int	quitmore = 0;
@@ -6132,8 +6132,8 @@ ex_quit(exarg_T *eap)
     win_T	*wp;
 
     // Escape Room: Vim - intercept all quit commands
-    if (game_intercept_quit())
-	return;
+    game_intercept_quit();
+    return;
 
     if (cmdwin_type != 0)
     {
@@ -6248,8 +6248,8 @@ before_quit_all(exarg_T *eap)
 ex_quit_all(exarg_T *eap)
 {
     // Escape Room: Vim - intercept all quit commands
-    if (game_intercept_quit())
-	return;
+    game_intercept_quit();
+    return;
 
     if (before_quit_all(eap) == FAIL)
 	return;
@@ -6741,8 +6741,8 @@ ex_stop(exarg_T *eap)
 ex_exit(exarg_T *eap)
 {
     // Escape Room: Vim - intercept all quit commands
-    if (game_intercept_quit())
-	return;
+    game_intercept_quit();
+    return;
 
 #ifdef FEAT_EVAL
     if (not_in_vim9(eap) == FAIL)
