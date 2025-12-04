@@ -14,6 +14,31 @@
 #include "vim.h"
 #include "../game/game.h"
 
+/*
+ * Escape Room: Vim - intercept quit commands during gameplay.
+ * Returns 1 if the game handled the quit (caller should return).
+ * Returns 0 if normal Vim quit logic should proceed (never happens in game).
+ */
+    static int
+game_intercept_quit(void)
+{
+    if (game_is_active())
+    {
+	// In level - fire win/fail event based on cursor position
+	if (game_check_win_conditions())
+	    apply_autocmds(EVENT_USER, (char_u *)"GameLevelComplete",
+			   curbuf->b_fname, TRUE, curbuf);
+	else
+	    apply_autocmds(EVENT_USER, (char_u *)"GameLevelFailed",
+			   curbuf->b_fname, TRUE, curbuf);
+	return 1;
+    }
+
+    // Between levels - quit entirely
+    getout(0);
+    return 1;
+}
+
 static int	quitmore = 0;
 static int	ex_pressedreturn = FALSE;
 #ifndef FEAT_PRINTER
@@ -6106,24 +6131,9 @@ ex_quit(exarg_T *eap)
 {
     win_T	*wp;
 
-    // Escape Room: Vim - always intercept :q
-    if (game_is_active())
-    {
-	// In level - check win conditions
-	if (game_check_win_conditions())
-	    apply_autocmds(EVENT_USER, (char_u *)"GameLevelComplete",
-			   curbuf->b_fname, TRUE, curbuf);
-	else
-	    apply_autocmds(EVENT_USER, (char_u *)"GameLevelFailed",
-			   curbuf->b_fname, TRUE, curbuf);
+    // Escape Room: Vim - intercept all quit commands
+    if (game_intercept_quit())
 	return;
-    }
-    else
-    {
-	// Between levels - quit everything
-	getout(0);
-	return;
-    }
 
     if (cmdwin_type != 0)
     {
@@ -6237,24 +6247,9 @@ before_quit_all(exarg_T *eap)
     static void
 ex_quit_all(exarg_T *eap)
 {
-    // Escape Room: Vim - always intercept :qa
-    if (game_is_active())
-    {
-	// In level - check win conditions
-	if (game_check_win_conditions())
-	    apply_autocmds(EVENT_USER, (char_u *)"GameLevelComplete",
-			   curbuf->b_fname, TRUE, curbuf);
-	else
-	    apply_autocmds(EVENT_USER, (char_u *)"GameLevelFailed",
-			   curbuf->b_fname, TRUE, curbuf);
+    // Escape Room: Vim - intercept all quit commands
+    if (game_intercept_quit())
 	return;
-    }
-    else
-    {
-	// Between levels - quit everything
-	getout(0);
-	return;
-    }
 
     if (before_quit_all(eap) == FAIL)
 	return;
@@ -6745,17 +6740,9 @@ ex_stop(exarg_T *eap)
     static void
 ex_exit(exarg_T *eap)
 {
-    // Escape Room: Vim - check win conditions and fire appropriate event
-    if (game_is_active())
-    {
-	if (game_check_win_conditions())
-	    apply_autocmds(EVENT_USER, (char_u *)"GameLevelComplete",
-			   curbuf->b_fname, TRUE, curbuf);
-	else
-	    apply_autocmds(EVENT_USER, (char_u *)"GameLevelFailed",
-			   curbuf->b_fname, TRUE, curbuf);
+    // Escape Room: Vim - intercept all quit commands
+    if (game_intercept_quit())
 	return;
-    }
 
 #ifdef FEAT_EVAL
     if (not_in_vim9(eap) == FAIL)
