@@ -59,6 +59,9 @@ function! Gameplay_Stop()
   augroup GameplayMoveTracking
     autocmd!
   augroup END
+
+  " Clean up level state (highlights, player, collision, viewport)
+  call Level_Cleanup()
 endfunction
 
 " ============================================================================
