@@ -128,16 +128,14 @@ endfunction
 
 " Set up input handlers for LORE screen
 function! s:SetupInput()
-  " Navigation (only if multiple levels unlocked)
-  nnoremap <buffer> <silent> j :call <SID>SelectNext()<CR>
-  nnoremap <buffer> <silent> k :call <SID>SelectPrev()<CR>
-
-  " Start game
-  nnoremap <buffer> <silent> <CR> :call <SID>StartLevel()<CR>
-
-  " ZZ/ZQ to quit (`:q` works via normal Ex command since game is inactive)
-  nnoremap <buffer> <silent> ZZ :qa!<CR>
-  nnoremap <buffer> <silent> ZQ :qa!<CR>
+  " Block all keys, then allow only what we need
+  call UI_BlockAll()
+  call UI_AllowKeys({
+        \ 'j': function('s:SelectNext'),
+        \ 'k': function('s:SelectPrev'),
+        \ '<CR>': function('s:StartLevel')
+        \ })
+  call UI_SetupQuit()
 endfunction
 
 " Select next level

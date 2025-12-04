@@ -178,12 +178,10 @@ endfunction
 " ============================================================================
 
 function! s:SetupInput()
-  " Enter to continue
-  nnoremap <buffer> <silent> <CR> :call <SID>Continue()<CR>
-
-  " ZZ/ZQ to quit (`:q` works via normal Ex command since game is inactive)
-  nnoremap <buffer> <silent> ZZ :qa!<CR>
-  nnoremap <buffer> <silent> ZQ :qa!<CR>
+  " Block all keys, then allow only what we need
+  call UI_BlockAll()
+  call UI_AllowKeys({'<CR>': function('s:Continue')})
+  call UI_SetupQuit()
 endfunction
 
 function! s:Continue()

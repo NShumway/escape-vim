@@ -21,6 +21,9 @@ source levels/api/level.vim
 " Load save system first (no dependencies)
 source game/ui/save.vim
 
+" Load keybind utilities (needed by all UI screens)
+source game/ui/keybinds.vim
+
 " Load sideport (needed by lore, gameplay, results)
 source game/ui/sideport.vim
 

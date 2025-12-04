@@ -92,12 +92,9 @@ function! Defeat_Start()
   setlocal nocursorline
   setlocal nocursorcolumn
 
-  " Block all input during display
-  nnoremap <buffer> <silent> <CR> <Nop>
-  nnoremap <buffer> <silent> j <Nop>
-  nnoremap <buffer> <silent> k <Nop>
-  nnoremap <buffer> <silent> h <Nop>
-  nnoremap <buffer> <silent> l <Nop>
+  " Block all input during display (timed screen, no interaction needed)
+  call UI_BlockAll()
+  call UI_SetupQuit()
 
   redraw!
 endfunction

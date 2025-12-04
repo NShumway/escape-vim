@@ -70,11 +70,9 @@ function! Sideport_Show()
   setlocal signcolumn=no
   setlocal winfixwidth
 
-  " Prevent bare 'q' (often accidental), ZZ/ZQ to quit
-  " `:q` works via normal Ex command since game is inactive on between-level screens
-  nnoremap <buffer> <silent> q <Nop>
-  nnoremap <buffer> <silent> ZZ :qa!<CR>
-  nnoremap <buffer> <silent> ZQ :qa!<CR>
+  " Block all input in sideport (focus should be on main window)
+  call UI_BlockAll()
+  call UI_SetupQuit()
 
   " Return focus to main window
   wincmd l
