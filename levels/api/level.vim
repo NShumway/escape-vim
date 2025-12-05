@@ -19,6 +19,8 @@ function! Level_Load(level_path)
   source levels/api/input.vim
   source levels/api/player.vim
   source levels/api/collision.vim
+  source levels/api/patrol.vim
+  source levels/api/enemy.vim
 
   " 2. Load viewport system
   source levels/viewport.vim
@@ -84,13 +86,53 @@ function! Level_Load(level_path)
   setlocal nomodifiable
   call s:SetupUI()
 
-  " 14. Load level-specific logic if present
+  " 14. Load and spawn spies if spies.vim exists
+  let l:spies_path = a:level_path . '/spies.vim'
+  if filereadable(l:spies_path)
+    call s:LoadSpies(l:spies_path, l:pad_top, l:pad_left)
+  endif
+
+  " 15. Load level-specific logic if present
   let l:logic_path = a:level_path . '/logic.vim'
   if filereadable(l:logic_path)
     execute 'source ' . l:logic_path
   endif
 
   redraw!
+endfunction
+
+" Internal: Load spies from spies.vim and spawn them
+" @param spies_path: path to spies.vim file
+" @param pad_top: viewport top padding
+" @param pad_left: viewport left padding
+function! s:LoadSpies(spies_path, pad_top, pad_left)
+  " Read and evaluate the spies file (it's a Vim list literal)
+  let l:lines = readfile(a:spies_path)
+  " Filter out comment lines before eval
+  let l:code_lines = filter(copy(l:lines), 'v:val !~# "^\\s*\""')
+  let l:spies = eval(join(l:code_lines, ''))
+
+  " Spawn each spy with adjusted positions
+  for l:spy in l:spies
+    " Adjust spawn position for viewport padding
+    let l:spawn = [l:spy.spawn[0] + a:pad_top, l:spy.spawn[1] + a:pad_left]
+
+    " Adjust route endpoints for viewport padding
+    let l:adjusted_route = []
+    for l:vec in l:spy.route
+      let l:adjusted_vec = {
+            \ 'end': [l:vec.end[0] + a:pad_top, l:vec.end[1] + a:pad_left],
+            \ 'dir': l:vec.dir
+            \ }
+      call add(l:adjusted_route, l:adjusted_vec)
+    endfor
+
+    " Spawn the spy
+    call Enemy_Spawn(l:spy.id, l:spawn, l:adjusted_route, l:spy.speed)
+  endfor
+
+  " Start the enemy tick system
+  call Enemy_Start()
 endfunction
 
 " Internal: Handle cursor movement
@@ -148,6 +190,14 @@ function! Level_Cleanup()
   augroup GameLevel
     autocmd!
   augroup END
+
+  " Clean up enemy system first (before highlight cleanup)
+  if exists('*Enemy_Stop')
+    call Enemy_Stop()
+  endif
+  if exists('*Enemy_RemoveAll')
+    call Enemy_RemoveAll()
+  endif
 
   " Clean up API module state (these are defined after Level_Load sources the files)
   if exists('*Highlight_ClearAll')

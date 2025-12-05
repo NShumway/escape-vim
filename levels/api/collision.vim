@@ -7,6 +7,7 @@ let s:last_valid_pos = [0, 0]  " character coordinates
 let s:in_error_state = 0
 let s:error_duration_ms = 300
 let s:wall_callback = v:null
+let s:spy_callback = v:null    " Called on spy collision (defeat)
 
 " Check if a position is a wall
 " @param line_num: 1-indexed line number
@@ -54,8 +55,23 @@ function! s:EnterErrorState(line, col)
     call s:wall_callback(a:line, a:col)
   endif
 
-  " Clear error state after delay
-  call timer_start(s:error_duration_ms, {-> execute('let s:in_error_state = 0')})
+  " Clear error state after delay - use tick system if available
+  if exists('*Tick_After') && Tick_IsRunning()
+    let l:ticks = Tick_MsToTicks(s:error_duration_ms)
+    call Tick_After('collision_error', l:ticks, {tick -> execute('let s:in_error_state = 0')})
+  else
+    call timer_start(s:error_duration_ms, {-> execute('let s:in_error_state = 0')})
+  endif
+endfunction
+
+" Handle tick-based movement collision (called before move attempt)
+" Provides visual feedback when player tries to move into a wall
+" @param line: attempted line position
+" @param col: attempted column position
+function! Collision_OnTickedMove(line, col)
+  if !s:in_error_state
+    call s:EnterErrorState(a:line, a:col)
+  endif
 endfunction
 
 " Handle cursor movement - call from CursorMoved autocommand
@@ -90,4 +106,36 @@ function! Collision_Cleanup()
   let s:last_valid_pos = [0, 0]
   let s:in_error_state = 0
   let s:wall_callback = v:null
+  let s:spy_callback = v:null
+endfunction
+
+" ============================================================================
+" Spy Collision Detection
+" ============================================================================
+
+" Register callback for spy collision (defeat)
+" @param Callback: funcref called when player touches spy
+function! Collision_SetSpyCallback(Callback)
+  let s:spy_callback = a:Callback
+endfunction
+
+" Check if player is colliding with any spy
+" Called from player movement and spy movement
+" @param player_pos: [line, col]
+function! Collision_CheckSpies(player_pos)
+  if !exists('*Enemy_CheckCollision')
+    return
+  endif
+
+  if Enemy_CheckCollision(a:player_pos)
+    call Collision_OnSpyCollision()
+  endif
+endfunction
+
+" Called when spy collision is detected
+" Triggers the defeat callback
+function! Collision_OnSpyCollision()
+  if s:spy_callback != v:null
+    call s:spy_callback()
+  endif
 endfunction

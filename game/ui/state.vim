@@ -14,9 +14,8 @@ let s:current_level_id = 1
 let s:current_level_meta = {}
 let s:current_level_path = ''
 
-" Timer IDs for cleanup
-let s:firework_timer = -1
-let s:transition_timer = -1
+" Transition timer ID (for tick system one-shots)
+let s:transition_id = ''
 
 " ============================================================================
 " Level Data Getters
@@ -42,9 +41,9 @@ endfunction
 " @param new_state: 'LORE' | 'GAMEPLAY' | 'FIREWORKS' | 'RESULTS'
 function! GameTransition(new_state)
   " Stop any pending transition timer to prevent race conditions
-  if s:transition_timer >= 0
-    call timer_stop(s:transition_timer)
-    let s:transition_timer = -1
+  if s:transition_id != ''
+    call Tick_Unsubscribe(s:transition_id)
+    let s:transition_id = ''
   endif
 
   let l:old_state = g:game_state
@@ -60,6 +59,8 @@ endfunction
 " Internal: Cleanup when leaving a state
 function! s:CleanupState(state)
   if a:state == 'GAMEPLAY'
+    " Stop gameplay (cleans up level, enemies, highlights, etc.)
+    call Gameplay_Stop()
     " Clear exit position so :q works normally on between-level screens
     call gamesetexit(0, 0)
   elseif a:state == 'FIREWORKS'
@@ -74,17 +75,21 @@ function! s:EnterState(state)
   if a:state == 'LORE'
     call Lore_Render()
   elseif a:state == 'GAMEPLAY'
+    call Tick_Start()
     call Gameplay_Start()
   elseif a:state == 'FIREWORKS'
     call Fireworks_Start()
-    " Auto-transition to RESULTS after 2 seconds
-    let s:transition_timer = timer_start(2000, {-> GameTransition('RESULTS')})
+    " Auto-transition to RESULTS after 2 seconds (40 ticks)
+    let s:transition_id = 'fireworks_transition'
+    call Tick_After(s:transition_id, 40, {tick -> GameTransition('RESULTS')})
   elseif a:state == 'RESULTS'
+    call Tick_Stop()
     call Results_Render()
   elseif a:state == 'DEFEAT'
     call Defeat_Start()
-    " Auto-transition back to LORE after 2 seconds (retry level)
-    let s:transition_timer = timer_start(2000, {-> GameTransition('LORE')})
+    " Auto-transition back to LORE after 2 seconds (40 ticks)
+    let s:transition_id = 'defeat_transition'
+    call Tick_After(s:transition_id, 40, {tick -> GameTransition('LORE')})
   endif
 endfunction
 

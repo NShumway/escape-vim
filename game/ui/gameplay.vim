@@ -81,6 +81,10 @@ endfunction
 
 " Stop gameplay (cleanup)
 function! Gameplay_Stop()
+  " Guard against being called multiple times
+  if !s:gameplay_active
+    return
+  endif
   let s:gameplay_active = 0
 
   " Stop timer

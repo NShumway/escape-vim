@@ -1,0 +1,67 @@
+# Level 3: The Watchers
+# Spy evasion level - navigate past patrolling guards
+#
+# All positions are 1-indexed to match Vim conventions.
+
+dimensions: [50, 100]  # rows, cols
+start: [3, 3]
+exit: [48, 98]
+
+walls:
+  # Top horizontal divider (row 6)
+  - type: hline
+    line: [6, 2, 99]
+
+  # Bottom horizontal divider (row 46)
+  - type: hline
+    line: [46, 2, 99]
+
+  # Room blocks - row 1
+  - type: rect
+    rect: [11, 11, 8, 15]
+
+  - type: rect
+    rect: [11, 36, 8, 15]
+
+  - type: rect
+    rect: [11, 61, 8, 15]
+
+  # Room blocks - row 2
+  - type: rect
+    rect: [26, 11, 8, 15]
+
+  - type: rect
+    rect: [26, 36, 8, 15]
+
+  - type: rect
+    rect: [26, 61, 8, 15]
+
+openings:
+  # Top wall gap on right side
+  - type: hline
+    line: [6, 96, 99]
+
+  # Bottom wall gap on left side
+  - type: hline
+    line: [46, 3, 6]
+
+spies:
+  - id: top_guard
+    pattern: horizontal
+    endpoints: [[4, 11], [4, 81]]
+    speed: 1.0
+
+  - id: middle_corridor
+    pattern: horizontal
+    endpoints: [[22, 6], [22, 91]]
+    speed: 0.8
+
+  - id: bottom_guard
+    pattern: horizontal
+    endpoints: [[48, 11], [48, 81]]
+    speed: 0.9
+
+  - id: exit_guard
+    pattern: vertical
+    endpoints: [[47, 96], [49, 96]]
+    speed: 0.7

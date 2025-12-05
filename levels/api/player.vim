@@ -7,6 +7,12 @@ let s:floor_char = ' '
 let s:player_pos = [0, 0]      " [line, char_col] in character coordinates
 let s:player_highlight_id = 0
 
+" Tick-governed movement state
+let s:movement_queue = ''       " Most recent queued direction: 'h', 'j', 'k', 'l', or ''
+let s:move_interval = 2         " Ticks between moves (2 = 10 moves/sec at 50ms tick)
+let s:last_move_tick = 0
+let s:tick_movement_enabled = 0 " Whether to use tick-based movement
+
 " Internal: draw player at current position
 function! s:DrawPlayer()
   call Buffer_SetChar(s:player_pos[0], s:player_pos[1], s:player_char)
@@ -74,4 +80,134 @@ function! Player_Cleanup()
     let s:player_highlight_id = 0
   endif
   let s:player_pos = [0, 0]
+
+  " Clean up tick movement
+  if s:tick_movement_enabled
+    call Tick_Unsubscribe('player_movement')
+    let s:tick_movement_enabled = 0
+  endif
+  let s:movement_queue = ''
+  let s:last_move_tick = 0
+endfunction
+
+" ============================================================================
+" Tick-Governed Movement System
+" ============================================================================
+
+" Enable tick-based movement (call during level setup for levels that need it)
+function! Player_EnableTickMovement()
+  let s:tick_movement_enabled = 1
+  let s:movement_queue = ''
+  let s:last_move_tick = Tick_GetCurrent()
+
+  " Subscribe to tick system
+  call Tick_Subscribe('player_movement', function('s:OnMovementTick'), 1)
+endfunction
+
+" Disable tick-based movement (for levels using native Vim motions)
+function! Player_DisableTickMovement()
+  if s:tick_movement_enabled
+    call Tick_Unsubscribe('player_movement')
+    let s:tick_movement_enabled = 0
+  endif
+  let s:movement_queue = ''
+endfunction
+
+" Check if tick movement is enabled
+function! Player_IsTickMovementEnabled()
+  return s:tick_movement_enabled
+endfunction
+
+" Queue a movement direction (called by key mappings)
+" Only keeps the most recent direction - no queue buildup
+" @param direction: 'h', 'j', 'k', or 'l'
+function! Player_QueueMove(direction)
+  if !s:tick_movement_enabled
+    return
+  endif
+  let s:movement_queue = a:direction
+endfunction
+
+" Set movement interval (for speed powerups/debuffs)
+" @param n: ticks between moves (1 = fastest, higher = slower)
+function! Player_SetMoveInterval(n)
+  let s:move_interval = a:n
+endfunction
+
+" Get current movement interval
+function! Player_GetMoveInterval()
+  return s:move_interval
+endfunction
+
+" Internal: Process movement on tick
+" @param tick: current tick number
+" @return: 1 to stay subscribed
+function! s:OnMovementTick(tick)
+  " Check if movement interval has elapsed
+  if a:tick - s:last_move_tick < s:move_interval
+    return 1
+  endif
+
+  " Check if there's a queued movement
+  if s:movement_queue == ''
+    return 1
+  endif
+
+  " Calculate new position based on direction
+  let l:cur_pos = s:player_pos
+  let l:new_line = l:cur_pos[0]
+  let l:new_col = l:cur_pos[1]
+
+  if s:movement_queue == 'h'
+    let l:new_col -= 1
+  elseif s:movement_queue == 'l'
+    let l:new_col += 1
+  elseif s:movement_queue == 'k'
+    let l:new_line -= 1
+  elseif s:movement_queue == 'j'
+    let l:new_line += 1
+  endif
+
+  " Clear the queue
+  let s:movement_queue = ''
+  let s:last_move_tick = a:tick
+
+  " Check for wall collision before moving
+  if Collision_IsWall(l:new_line, l:new_col)
+    " Trigger wall collision feedback
+    call Collision_OnTickedMove(l:new_line, l:new_col)
+    return 1
+  endif
+
+  " Move the player
+  call Player_MoveTo(l:new_line, l:new_col)
+
+  " Update cursor position to match player
+  call Pos_SetCursor(l:new_line, l:new_col)
+
+  " Update collision tracking
+  call Collision_SetLastValidPos(l:new_line, l:new_col)
+
+  " Check for spy collision (if enemy system is loaded)
+  if exists('*Collision_CheckSpies')
+    call Collision_CheckSpies([l:new_line, l:new_col])
+  endif
+
+  return 1
+endfunction
+
+" Setup tick movement key mappings for the current buffer
+function! Player_SetupTickMappings()
+  nnoremap <buffer> <silent> h :call Player_QueueMove('h')<CR>
+  nnoremap <buffer> <silent> j :call Player_QueueMove('j')<CR>
+  nnoremap <buffer> <silent> k :call Player_QueueMove('k')<CR>
+  nnoremap <buffer> <silent> l :call Player_QueueMove('l')<CR>
+endfunction
+
+" Remove tick movement key mappings
+function! Player_ClearTickMappings()
+  silent! nunmap <buffer> h
+  silent! nunmap <buffer> j
+  silent! nunmap <buffer> k
+  silent! nunmap <buffer> l
 endfunction

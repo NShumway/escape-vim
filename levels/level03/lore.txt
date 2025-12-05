@@ -1,0 +1,19 @@
+"You made it through the maze. Good.
+ But now the real test begins.
+
+ See those shadows moving in the
+ corridors? Those are the Watchers.
+ They patrol these halls endlessly,
+ and if they spot you... let's just
+ say you won't get a second chance.
+
+ Study their patterns. Time your
+ movements. The spaces between walls
+ are your only cover.
+
+ h, j, k, l got you this far.
+ Now you'll need patience too.
+
+ Reach the exit. Don't get caught."
+
+                    — The Commander

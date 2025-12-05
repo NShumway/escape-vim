@@ -226,32 +226,26 @@ function! Sideport_RenderResults(victory_quote)
 endfunction
 
 " ============================================================================
-" Timer Update (for gameplay)
+" Timer Update (for gameplay) - uses tick system
 " ============================================================================
 
-let s:timer_update_id = -1
-
-" Start the timer update loop
+" Start the timer update loop (subscribes to tick system)
 function! Sideport_StartTimer()
-  if s:timer_update_id >= 0
-    call timer_stop(s:timer_update_id)
-  endif
-  let s:timer_update_id = timer_start(1000, function('s:UpdateTimer'), {'repeat': -1})
+  " Subscribe to tick system: 20 ticks = 1 second
+  call Tick_Subscribe('sideport', function('s:OnTick'), 20)
 endfunction
 
 " Stop the timer update loop
 function! Sideport_StopTimer()
-  if s:timer_update_id >= 0
-    call timer_stop(s:timer_update_id)
-    let s:timer_update_id = -1
-  endif
+  call Tick_Unsubscribe('sideport')
 endfunction
 
-" Internal: Update timer display
-function! s:UpdateTimer(timer)
+" Internal: Tick callback for timer display update
+" @param tick: current tick number
+" @return: 1 to stay subscribed, 0 to unsubscribe
+function! s:OnTick(tick)
   if g:game_state != 'GAMEPLAY'
-    call Sideport_StopTimer()
-    return
+    return 0  " Unsubscribe
   endif
 
   let l:elapsed = Gameplay_GetElapsed()
@@ -268,5 +262,7 @@ function! s:UpdateTimer(timer)
         \ l:time_str,
         \ Gameplay_GetMoves()
         \ )
+
+  return 1  " Stay subscribed
 endfunction
 

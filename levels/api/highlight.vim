@@ -40,6 +40,10 @@ function! Highlight_ClearAll()
     silent! call matchdelete(l:id)
   endfor
   let s:active_highlights = {}
+
+  " Also clear any stray matches in the current window
+  " This catches highlights that may have been orphaned
+  call clearmatches()
 endfunction
 
 " Add a temporary highlight that auto-removes after delay
@@ -50,6 +54,14 @@ endfunction
 " @return: match ID
 function! Highlight_AddTimed(group, line_num, char_col, duration_ms)
   let l:id = Highlight_Add(a:group, a:line_num, a:char_col)
-  call timer_start(a:duration_ms, {-> Highlight_Remove(l:id)})
+
+  " Use tick system if available, fall back to timer_start
+  if exists('*Tick_After') && Tick_IsRunning()
+    let l:ticks = Tick_MsToTicks(a:duration_ms)
+    call Tick_After('highlight_' . l:id, l:ticks, {tick -> Highlight_Remove(l:id)})
+  else
+    call timer_start(a:duration_ms, {-> Highlight_Remove(l:id)})
+  endif
+
   return l:id
 endfunction

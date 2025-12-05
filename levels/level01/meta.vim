@@ -13,6 +13,7 @@
   'victory_quote': "Well done, soldier. You've taken your\nfirst steps toward freedom.\n\nBut don't celebrate yet. The real\nchallenges lie ahead.",
   'start_cursor': [5, 5],
   'exit_cursor': [5, 15],
+  'maze': {'lines': 14, 'cols': 24},
   'viewport': {'lines': 15, 'cols': 25},
   'blocked_categories': ['arrows', 'search', 'find_char', 'word_motion',
                          'line_jump', 'paragraph', 'matching', 'marks',

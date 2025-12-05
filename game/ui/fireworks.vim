@@ -92,13 +92,14 @@ function! s:GenerateFrame(frame_num, width, height)
   endfor
 
   " Add victory banner in center
+  " Calculate banner_x once using first line to ensure consistent alignment
   let l:banner_y = (a:height / 2) - 3
+  let l:banner_x = (a:width - strdisplaywidth(s:victory_banner[0])) / 2
+  if l:banner_x < 0
+    let l:banner_x = 0
+  endif
   for l:idx in range(len(s:victory_banner))
     let l:banner_line = s:victory_banner[l:idx]
-    let l:banner_x = (a:width - len(l:banner_line)) / 2
-    if l:banner_x < 0
-      let l:banner_x = 0
-    endif
     let l:y = l:banner_y + l:idx
     if l:y >= 0 && l:y < a:height
       let l:canvas[l:y] = strpart(repeat(' ', l:banner_x), 0, l:banner_x) . l:banner_line
