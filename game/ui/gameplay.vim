@@ -87,9 +87,6 @@ function! Gameplay_Stop()
   endif
   let s:gameplay_active = 0
 
-  " Stop timer
-  call Sideport_StopTimer()
-
   " Remove move tracking
   augroup GameplayMoveTracking
     autocmd!

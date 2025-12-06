@@ -17,6 +17,12 @@ let s:current_level_path = ''
 " Transition timer ID (for tick system one-shots)
 let s:transition_id = ''
 
+" Caching (populated at Game_Start, invalidated on level complete)
+let s:manifest_cache = []
+let s:completed_levels_cache = []
+let s:commands_cache = []
+let s:commands_cache_valid = 0
+
 " ============================================================================
 " Level Data Getters
 " ============================================================================
@@ -59,12 +65,18 @@ endfunction
 " Internal: Cleanup when leaving a state
 function! s:CleanupState(state)
   if a:state == 'GAMEPLAY'
+    " Unsubscribe all gameplay tick subscribers
+    call Tick_UnsubscribePrefix('gameplay:')
     " Stop gameplay (cleans up level, enemies, highlights, etc.)
     call Gameplay_Stop()
     " Clear exit position so :q works normally on between-level screens
     call gamesetexit(0, 0)
   elseif a:state == 'FIREWORKS'
-    call Fireworks_Stop()
+    " Unsubscribe all fireworks tick subscribers
+    call Tick_UnsubscribePrefix('fireworks:')
+  elseif a:state == 'RESULTS'
+    " Unsubscribe all results tick subscribers
+    call Tick_UnsubscribePrefix('results:')
   elseif a:state == 'DEFEAT'
     call Defeat_Stop()
   endif
@@ -75,7 +87,6 @@ function! s:EnterState(state)
   if a:state == 'LORE'
     call Lore_Render()
   elseif a:state == 'GAMEPLAY'
-    call Tick_Start()
     call Gameplay_Start()
   elseif a:state == 'FIREWORKS'
     call Fireworks_Start()
@@ -83,7 +94,6 @@ function! s:EnterState(state)
     let s:transition_id = 'fireworks_transition'
     call Tick_After(s:transition_id, 40, {tick -> GameTransition('RESULTS')})
   elseif a:state == 'RESULTS'
-    call Tick_Stop()
     call Results_Render()
   elseif a:state == 'DEFEAT'
     call Defeat_Start()
@@ -122,11 +132,9 @@ endfunction
 function! Game_LoadLevelMeta(level_id)
   let s:current_level_id = a:level_id
 
-  " Read manifest to find level directory
-  let l:manifest = eval(join(readfile('levels/manifest.vim'), ''))
-
+  " Use cached manifest
   let l:found = 0
-  for l:entry in l:manifest
+  for l:entry in s:manifest_cache
     if l:entry.id == a:level_id
       let s:current_level_path = 'levels/' . l:entry.dir
       let l:found = 1
@@ -152,18 +160,17 @@ function! Game_LoadLevelMeta(level_id)
 endfunction
 
 " Get cumulative commands from all completed levels + current
-" @return: list of command dictionaries
+" @return: list of command dictionaries (cached)
 function! Game_GetAllCommands()
+  if s:commands_cache_valid
+    return s:commands_cache
+  endif
+
   let l:all_commands = []
-  let l:save = Save_Load()
-  let l:completed = get(l:save, 'completed_levels', [])
 
-  " Read manifest
-  let l:manifest = eval(join(readfile('levels/manifest.vim'), ''))
-
-  " Add commands from completed levels
-  for l:entry in l:manifest
-    if index(l:completed, l:entry.id) >= 0
+  " Add commands from completed levels (using cached data)
+  for l:entry in s:manifest_cache
+    if index(s:completed_levels_cache, l:entry.id) >= 0
       let l:meta_path = 'levels/' . l:entry.dir . '/meta.vim'
       if filereadable(l:meta_path)
         let l:meta = eval(join(readfile(l:meta_path), ''))
@@ -173,11 +180,13 @@ function! Game_GetAllCommands()
   endfor
 
   " Add current level's commands (if not already included)
-  if index(l:completed, s:current_level_id) < 0
+  if index(s:completed_levels_cache, s:current_level_id) < 0
     let l:all_commands += get(s:current_level_meta, 'commands', [])
   endif
 
-  return l:all_commands
+  let s:commands_cache = l:all_commands
+  let s:commands_cache_valid = 1
+  return s:commands_cache
 endfunction
 
 " ============================================================================
@@ -186,19 +195,24 @@ endfunction
 
 " Start the game from the beginning (called on launch)
 function! Game_Start()
-  " Load save data
+  " Load manifest once and cache it
+  let s:manifest_cache = eval(join(readfile('levels/manifest.vim'), ''))
+
+  " Load save data and cache completed levels
   let l:save = Save_Load()
+  let s:completed_levels_cache = get(l:save, 'completed_levels', [])
+
+  " Invalidate commands cache (will rebuild on first access)
+  let s:commands_cache_valid = 0
 
   " Determine which level to show
-  let l:completed = get(l:save, 'completed_levels', [])
-  if empty(l:completed)
+  if empty(s:completed_levels_cache)
     let s:current_level_id = 1
   else
     " Find next incomplete level
-    let l:manifest = eval(join(readfile('levels/manifest.vim'), ''))
     let s:current_level_id = 1
-    for l:entry in l:manifest
-      if index(l:completed, l:entry.id) < 0
+    for l:entry in s:manifest_cache
+      if index(s:completed_levels_cache, l:entry.id) < 0
         let s:current_level_id = l:entry.id
         break
       endif
@@ -207,6 +221,9 @@ function! Game_Start()
 
   " Load level metadata
   call Game_LoadLevelMeta(s:current_level_id)
+
+  " Start the tick system once - it runs for the lifetime of the game
+  call Tick_Start()
 
   " Start in LORE state
   call GameTransition('LORE')
@@ -221,6 +238,14 @@ function! Game_LevelComplete()
   let l:stats = Gameplay_GetFinalStats()
   call Save_CompleteLevel(s:current_level_id, l:stats.time, l:stats.moves)
 
+  " Update in-memory completed levels cache
+  if index(s:completed_levels_cache, s:current_level_id) < 0
+    call add(s:completed_levels_cache, s:current_level_id)
+  endif
+
+  " Invalidate commands cache (new commands unlocked)
+  let s:commands_cache_valid = 0
+
   " Transition to fireworks
   call GameTransition('FIREWORKS')
 endfunction
@@ -234,14 +259,10 @@ endfunction
 
 " Called to advance to next level after results
 function! Game_NextLevel()
-  let l:save = Save_Load()
-  let l:completed = get(l:save, 'completed_levels', [])
-  let l:manifest = eval(join(readfile('levels/manifest.vim'), ''))
-
-  " Find next level
+  " Find next level using cached data
   let l:next_id = -1
-  for l:entry in l:manifest
-    if index(l:completed, l:entry.id) < 0
+  for l:entry in s:manifest_cache
+    if index(s:completed_levels_cache, l:entry.id) < 0
       let l:next_id = l:entry.id
       break
     endif

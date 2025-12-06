@@ -232,22 +232,13 @@ endfunction
 " Start the timer update loop (subscribes to tick system)
 function! Sideport_StartTimer()
   " Subscribe to tick system: 20 ticks = 1 second
-  call Tick_Subscribe('sideport', function('s:OnTick'), 20)
-endfunction
-
-" Stop the timer update loop
-function! Sideport_StopTimer()
-  call Tick_Unsubscribe('sideport')
+  call Tick_Subscribe('gameplay:sideport', function('s:OnTick'), 20)
 endfunction
 
 " Internal: Tick callback for timer display update
 " @param tick: current tick number
-" @return: 1 to stay subscribed, 0 to unsubscribe
+" @return: 1 to stay subscribed
 function! s:OnTick(tick)
-  if g:game_state != 'GAMEPLAY'
-    return 0  " Unsubscribe
-  endif
-
   let l:elapsed = Gameplay_GetElapsed()
   let l:time_str = Util_FormatTime(l:elapsed)
 

@@ -5,7 +5,6 @@
 " State
 " ============================================================================
 
-let s:firework_timer = -1
 let s:firework_frame = 0
 let s:firework_frames = []
 let s:firework_bufnr = -1
@@ -156,18 +155,10 @@ function! Fireworks_Start()
   call UI_BlockAll()
   call UI_SetupQuit()
 
-  " Start animation
+  " Start animation using tick system (5 ticks = 250ms at 50ms/tick)
   let s:firework_frame = 0
   call s:RenderFrame()
-  let s:firework_timer = timer_start(250, function('s:AnimateFrame'), {'repeat': -1})
-endfunction
-
-" Stop the fireworks animation
-function! Fireworks_Stop()
-  if s:firework_timer >= 0
-    call timer_stop(s:firework_timer)
-    let s:firework_timer = -1
-  endif
+  call Tick_Subscribe('fireworks:animation', function('s:AnimateFrame'), 5)
 endfunction
 
 " Render current frame
@@ -187,8 +178,11 @@ function! s:RenderFrame()
   redraw!
 endfunction
 
-" Animate to next frame
-function! s:AnimateFrame(timer)
+" Animate to next frame (tick callback)
+" @param tick: current tick number
+" @return: 1 to stay subscribed
+function! s:AnimateFrame(tick)
   let s:firework_frame = (s:firework_frame + 1) % len(s:firework_frames)
   call s:RenderFrame()
+  return 1
 endfunction

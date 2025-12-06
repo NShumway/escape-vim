@@ -73,6 +73,20 @@ function! Tick_Unsubscribe(id)
   endif
 endfunction
 
+" Remove all subscribers with IDs starting with prefix
+" @param prefix: string prefix to match (e.g., 'gameplay:')
+function! Tick_UnsubscribePrefix(prefix)
+  let l:to_remove = []
+  for l:id in keys(s:subscribers)
+    if l:id[:len(a:prefix)-1] ==# a:prefix
+      call add(l:to_remove, l:id)
+    endif
+  endfor
+  for l:id in l:to_remove
+    unlet s:subscribers[l:id]
+  endfor
+endfunction
+
 " Get current tick number
 " @return: current tick count since Tick_Start()
 function! Tick_GetCurrent()

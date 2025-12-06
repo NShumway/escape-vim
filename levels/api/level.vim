@@ -191,10 +191,7 @@ function! Level_Cleanup()
     autocmd!
   augroup END
 
-  " Clean up enemy system first (before highlight cleanup)
-  if exists('*Enemy_Stop')
-    call Enemy_Stop()
-  endif
+  " Clean up enemy system (tick unsubscribe handled by state cleanup)
   if exists('*Enemy_RemoveAll')
     call Enemy_RemoveAll()
   endif

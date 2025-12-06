@@ -6,7 +6,6 @@
 " ============================================================================
 
 let s:results_bufnr = -1
-let s:results_timer = -1
 let s:star_frame = 0
 
 " Mock leaderboard data
@@ -43,9 +42,9 @@ function! Results_Render()
   " Set up input
   call s:SetupInput()
 
-  " Start subtle background animation
+  " Start subtle background animation using tick system (10 ticks = 500ms at 50ms/tick)
   let s:star_frame = 0
-  let s:results_timer = timer_start(500, function('s:AnimateStars'), {'repeat': -1})
+  call Tick_Subscribe('results:stars', function('s:AnimateStars'), 10)
 endfunction
 
 " Render main content area
@@ -157,21 +156,13 @@ endfunction
 " Animation
 " ============================================================================
 
-function! s:AnimateStars(timer)
-  if g:game_state != 'RESULTS'
-    call s:StopAnimation()
-    return
-  endif
-
+" Animate stars (tick callback)
+" @param tick: current tick number
+" @return: 1 to stay subscribed
+function! s:AnimateStars(tick)
   let s:star_frame = (s:star_frame + 1) % 6
   call s:RenderMainArea()
-endfunction
-
-function! s:StopAnimation()
-  if s:results_timer >= 0
-    call timer_stop(s:results_timer)
-    let s:results_timer = -1
-  endif
+  return 1
 endfunction
 
 " ============================================================================
@@ -186,6 +177,5 @@ function! s:SetupInput()
 endfunction
 
 function! s:Continue()
-  call s:StopAnimation()
   call Game_NextLevel()
 endfunction

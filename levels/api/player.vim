@@ -81,11 +81,8 @@ function! Player_Cleanup()
   endif
   let s:player_pos = [0, 0]
 
-  " Clean up tick movement
-  if s:tick_movement_enabled
-    call Tick_Unsubscribe('player_movement')
-    let s:tick_movement_enabled = 0
-  endif
+  " Reset tick movement state (cleanup handled by prefix unsubscribe)
+  let s:tick_movement_enabled = 0
   let s:movement_queue = ''
   let s:last_move_tick = 0
 endfunction
@@ -101,15 +98,13 @@ function! Player_EnableTickMovement()
   let s:last_move_tick = Tick_GetCurrent()
 
   " Subscribe to tick system
-  call Tick_Subscribe('player_movement', function('s:OnMovementTick'), 1)
+  call Tick_Subscribe('gameplay:player', function('s:OnMovementTick'), 1)
 endfunction
 
 " Disable tick-based movement (for levels using native Vim motions)
+" Note: cleanup is handled by prefix unsubscribe on state change
 function! Player_DisableTickMovement()
-  if s:tick_movement_enabled
-    call Tick_Unsubscribe('player_movement')
-    let s:tick_movement_enabled = 0
-  endif
+  let s:tick_movement_enabled = 0
   let s:movement_queue = ''
 endfunction
 

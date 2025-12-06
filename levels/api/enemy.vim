@@ -159,12 +159,7 @@ endfunction
 
 " Start enemy tick subscription
 function! Enemy_Start()
-  call Tick_Subscribe('enemy_movement', function('Enemy_OnTick'), 1)
-endfunction
-
-" Stop enemy tick subscription
-function! Enemy_Stop()
-  call Tick_Unsubscribe('enemy_movement')
+  call Tick_Subscribe('gameplay:enemy', function('Enemy_OnTick'), 1)
 endfunction
 
 " ============================================================================
