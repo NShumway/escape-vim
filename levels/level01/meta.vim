@@ -15,10 +15,8 @@
   'exit_cursor': [5, 15],
   'maze': {'lines': 14, 'cols': 24},
   'viewport': {'lines': 15, 'cols': 25},
-  'blocked_categories': ['arrows', 'search', 'find_char', 'word_motion',
-                         'line_jump', 'paragraph', 'matching', 'marks',
-                         'jump_list', 'scroll', 'insert', 'change',
-                         'delete', 'visual', 'undo_redo'],
+  'blocked_categories': ['arrows', 'search', 'find_char', 'word_motion', 'line_jump', 'paragraph', 'matching', 'marks', 'jump_list', 'scroll', 'insert', 'change', 'delete', 'visual', 'undo_redo'],
+  'features': [],
   'time_limit_seconds': v:null,
   'max_keystrokes': v:null
 }

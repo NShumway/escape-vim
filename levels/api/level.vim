@@ -9,6 +9,7 @@ let s:level_path = ''
 " Load a level from a directory path
 " @param level_path: path to level directory (e.g., 'levels/level01')
 function! Level_Load(level_path)
+  call Debug_Log('Level_Load: Starting load of ' . a:level_path)
   let s:level_path = a:level_path
 
   " 1. Load APIs (order matters - position first, others depend on it)
@@ -21,13 +22,22 @@ function! Level_Load(level_path)
   source levels/api/collision.vim
   source levels/api/patrol.vim
   source levels/api/enemy.vim
+  call Debug_Log('Level_Load: APIs loaded')
 
   " 2. Load viewport system
   source levels/viewport.vim
 
   " 3. Load and parse metadata
   let l:meta_path = a:level_path . '/meta.vim'
-  let s:current_meta = eval(join(readfile(l:meta_path), ''))
+  call Debug_Log('Level_Load: Reading meta from ' . l:meta_path)
+  try
+    let l:meta_content = join(readfile(l:meta_path), "")
+    let s:current_meta = eval(l:meta_content)
+    call Debug_Log('Level_Load: Meta parsed, title=' . get(s:current_meta, 'title', '?'))
+  catch
+    call Debug_Error('Level_Load: Failed to parse meta.vim - ' . v:exception)
+    throw 'Level_Load: ' . v:exception
+  endtry
 
   " 4. Initialize viewport
   call ViewportInit(s:current_meta)
@@ -92,10 +102,10 @@ function! Level_Load(level_path)
     call s:LoadSpies(l:spies_path, l:pad_top, l:pad_left)
   endif
 
-  " 15. Load level-specific logic if present
-  let l:logic_path = a:level_path . '/logic.vim'
-  if filereadable(l:logic_path)
-    execute 'source ' . l:logic_path
+  " 15. Set up level features
+  let l:features = get(s:current_meta, 'features', [])
+  if index(l:features, 'spies') >= 0
+    call Collision_SetSpyCallback({-> Game_LevelFailed()})
   endif
 
   redraw!

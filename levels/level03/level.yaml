@@ -3,9 +3,42 @@
 #
 # All positions are 1-indexed to match Vim conventions.
 
+id: 3
+features: ['spies']
+
 dimensions: [50, 100]  # rows, cols
 start: [3, 3]
 exit: [48, 98]
+viewport: [50, 100]  # Same as maze dimensions
+
+commands:
+  - key: 'h'
+    desc: 'move left'
+  - key: 'j'
+    desc: 'move down'
+  - key: 'k'
+    desc: 'move up'
+  - key: 'l'
+    desc: 'move right'
+  - key: ':q'
+    desc: 'escape (at exit)'
+
+blocked_categories:
+  - arrows
+  - search
+  - find_char
+  - word_motion
+  - line_jump
+  - paragraph
+  - matching
+  - marks
+  - jump_list
+  - scroll
+  - insert
+  - change
+  - delete
+  - visual
+  - undo_redo
 
 walls:
   # Top horizontal divider (row 6)

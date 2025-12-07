@@ -14,4 +14,6 @@ if [ "$1" = "--reset" ]; then
   exit 0
 fi
 
-VIMRUNTIME=./runtime ./src/vim --clean -S game/ui/init.vim
+# Development mode: enable debug logging by default
+# Production builds (app bundle) don't use play.sh and won't have this set
+VIMRUNTIME=./runtime ./src/vim --clean -c "let g:escape_vim_debug=1" -S game/ui/init.vim

@@ -36,21 +36,25 @@ def parse_vim_dict(content: str) -> Dict[str, Any]:
     - v:false -> False
     - Multiline strings with \n
     - Line continuation with \\ at start of line
+    - Comment lines starting with "
     """
-    # Join continuation lines (lines starting with \ after leading whitespace)
+    # Process lines: remove comments, handle continuations
     lines = content.split('\n')
-    joined_lines = []
+    processed_lines = []
     for line in lines:
         stripped = line.lstrip()
+        # Skip Vim comment lines (start with " at the beginning)
+        if stripped.startswith('"'):
+            continue
         if stripped.startswith('\\'):
             # Continuation line - append without the backslash
-            if joined_lines:
-                joined_lines[-1] += ' ' + stripped[1:].lstrip()
+            if processed_lines:
+                processed_lines[-1] += ' ' + stripped[1:].lstrip()
             else:
-                joined_lines.append(stripped[1:].lstrip())
+                processed_lines.append(stripped[1:].lstrip())
         else:
-            joined_lines.append(line)
-    content = '\n'.join(joined_lines)
+            processed_lines.append(line)
+    content = '\n'.join(processed_lines)
 
     # Replace Vim-specific values
     content = content.replace("v:null", "None")
@@ -66,6 +70,7 @@ def parse_vim_dict(content: str) -> Dict[str, Any]:
     while i < len(content):
         if content[i] == "'":
             # Vim single-quoted string: '' for literal quote, no other escapes
+            # Vim allows literal newlines in single-quoted strings
             j = i + 1
             inner_chars = []
             while j < len(content):
@@ -82,6 +87,8 @@ def parse_vim_dict(content: str) -> Dict[str, Any]:
             # Escape for Python double-quoted string
             inner = inner.replace('\\', '\\\\')
             inner = inner.replace('"', '\\"')
+            # Convert literal newlines to \n escape sequences for Python
+            inner = inner.replace('\n', '\\n')
             result.append('"' + inner + '"')
             i = j + 1
         elif content[i] == '"':

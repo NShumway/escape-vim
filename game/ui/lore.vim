@@ -58,11 +58,21 @@ function! s:RenderMainArea()
   call add(l:lines, '    ' . repeat('═', 42))
   call add(l:lines, '')
 
-  " Load and display lore text
-  let l:lore_path = Game_GetLevelPath() . '/lore.txt'
-  if filereadable(l:lore_path)
-    let l:lore_lines = readfile(l:lore_path)
-    for l:line in l:lore_lines
+  " Load and display lore text from lore.txt (legacy) or lore JSON
+  let l:level_id = Game_GetLevelId()
+  let l:lore_json_path = printf('levels/lore/level%02d.json', l:level_id)
+  let l:lore_txt_path = Game_GetLevelPath() . '/lore.txt'
+
+  if filereadable(l:lore_json_path)
+    " New pipeline: read from JSON
+    let l:lore_data = json_decode(join(readfile(l:lore_json_path), "\n"))
+    let l:lore_text = get(l:lore_data, 'lore', '')
+    for l:line in split(l:lore_text, '\n')
+      call add(l:lines, '    ' . l:line)
+    endfor
+  elseif filereadable(l:lore_txt_path)
+    " Legacy: read from lore.txt
+    for l:line in readfile(l:lore_txt_path)
       call add(l:lines, '    ' . l:line)
     endfor
   else

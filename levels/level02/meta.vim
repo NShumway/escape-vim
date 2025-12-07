@@ -1,5 +1,5 @@
 {
-  'title': 'First Steps',
+  'title': 'The Maze',
   'description': 'Learn hjkl and basic mode switching.',
   'objective': 'Navigate to the exit and escape.',
   'commands': [
@@ -15,10 +15,8 @@
   'exit_cursor': [36, 45],
   'maze': {'lines': 37, 'cols': 47},
   'viewport': {'lines': 50, 'cols': 100},
-  'blocked_categories': ['arrows', 'search', 'find_char', 'word_motion',
-                         'line_jump', 'paragraph', 'matching', 'marks',
-                         'jump_list', 'scroll', 'insert', 'change',
-                         'delete', 'visual', 'undo_redo'],
+  'blocked_categories': ['arrows', 'search', 'find_char', 'word_motion', 'line_jump', 'paragraph', 'matching', 'marks', 'jump_list', 'scroll', 'insert', 'change', 'delete', 'visual', 'undo_redo'],
+  'features': [],
   'time_limit_seconds': v:null,
   'max_keystrokes': v:null
 }

@@ -1,0 +1,368 @@
+# Level 2: The Maze
+# A snake-like corridor maze with nested paths
+#
+# All positions are 1-indexed to match Vim conventions.
+
+id: 2
+features: []
+
+dimensions: [37, 47]  # rows, cols
+start: [2, 2]
+exit: [36, 45]
+viewport: [50, 100]  # Larger viewport for the maze
+
+commands:
+  - key: 'h'
+    desc: 'move left'
+  - key: 'j'
+    desc: 'move down'
+  - key: 'k'
+    desc: 'move up'
+  - key: 'l'
+    desc: 'move right'
+  - key: ':q'
+    desc: 'escape (at exit)'
+
+blocked_categories:
+  - arrows
+  - search
+  - find_char
+  - word_motion
+  - line_jump
+  - paragraph
+  - matching
+  - marks
+  - jump_list
+  - scroll
+  - insert
+  - change
+  - delete
+  - visual
+  - undo_redo
+
+walls:
+  # Row 2 - single block walls
+  - type: hline
+    line: [2, 7, 7]
+  - type: hline
+    line: [2, 15, 15]
+  - type: hline
+    line: [2, 23, 23]
+  - type: hline
+    line: [2, 31, 31]
+
+  # Row 3 - complex pattern
+  - type: hline
+    line: [3, 3, 5]
+  - type: hline
+    line: [3, 7, 7]
+  - type: hline
+    line: [3, 9, 13]
+  - type: hline
+    line: [3, 15, 15]
+  - type: hline
+    line: [3, 17, 21]
+  - type: hline
+    line: [3, 23, 23]
+  - type: hline
+    line: [3, 25, 29]
+  - type: hline
+    line: [3, 31, 31]
+  - type: hline
+    line: [3, 33, 43]
+  - type: hline
+    line: [3, 45, 45]
+
+  # Row 4
+  - type: hline
+    line: [4, 5, 5]
+  - type: hline
+    line: [4, 7, 7]
+  - type: hline
+    line: [4, 13, 13]
+  - type: hline
+    line: [4, 17, 17]
+  - type: hline
+    line: [4, 21, 21]
+  - type: hline
+    line: [4, 25, 25]
+  - type: hline
+    line: [4, 29, 29]
+  - type: hline
+    line: [4, 33, 33]
+  - type: hline
+    line: [4, 43, 43]
+  - type: hline
+    line: [4, 45, 45]
+
+  # Row 5
+  - type: hline
+    line: [5, 2, 3]
+  - type: hline
+    line: [5, 5, 5]
+  - type: hline
+    line: [5, 7, 11]
+  - type: hline
+    line: [5, 13, 17]
+  - type: hline
+    line: [5, 19, 19]
+  - type: hline
+    line: [5, 21, 25]
+  - type: hline
+    line: [5, 27, 27]
+  - type: hline
+    line: [5, 29, 33]
+  - type: hline
+    line: [5, 35, 41]
+  - type: hline
+    line: [5, 43, 43]
+  - type: hline
+    line: [5, 45, 45]
+
+  # Row 6
+  - type: hline
+    line: [6, 5, 5]
+  - type: hline
+    line: [6, 11, 11]
+  - type: hline
+    line: [6, 19, 19]
+  - type: hline
+    line: [6, 27, 27]
+  - type: hline
+    line: [6, 35, 35]
+  - type: hline
+    line: [6, 41, 41]
+  - type: hline
+    line: [6, 43, 43]
+  - type: hline
+    line: [6, 45, 45]
+
+  # Row 7
+  - type: hline
+    line: [7, 3, 9]
+  - type: hline
+    line: [7, 11, 35]
+  - type: hline
+    line: [7, 37, 39]
+  - type: hline
+    line: [7, 41, 41]
+  - type: hline
+    line: [7, 43, 43]
+  - type: hline
+    line: [7, 45, 45]
+
+  # Row 8
+  - type: hline
+    line: [8, 9, 9]
+  - type: hline
+    line: [8, 37, 37]
+  - type: hline
+    line: [8, 39, 39]
+  - type: hline
+    line: [8, 41, 41]
+  - type: hline
+    line: [8, 43, 43]
+  - type: hline
+    line: [8, 45, 45]
+
+  # Row 9
+  - type: hline
+    line: [9, 3, 7]
+  - type: hline
+    line: [9, 9, 37]
+  - type: hline
+    line: [9, 39, 39]
+  - type: hline
+    line: [9, 41, 41]
+  - type: hline
+    line: [9, 43, 43]
+  - type: hline
+    line: [9, 45, 45]
+
+  # Row 10
+  - type: hline
+    line: [10, 3, 3]
+  - type: hline
+    line: [10, 7, 7]
+  - type: hline
+    line: [10, 39, 39]
+  - type: hline
+    line: [10, 41, 41]
+  - type: hline
+    line: [10, 43, 43]
+  - type: hline
+    line: [10, 45, 45]
+
+  # Row 11
+  - type: hline
+    line: [11, 3, 3]
+  - type: hline
+    line: [11, 5, 5]
+  - type: hline
+    line: [11, 7, 39]
+  - type: hline
+    line: [11, 41, 41]
+  - type: hline
+    line: [11, 43, 43]
+  - type: hline
+    line: [11, 45, 45]
+
+  # Row 12
+  - type: hline
+    line: [12, 3, 3]
+  - type: hline
+    line: [12, 5, 5]
+  - type: hline
+    line: [12, 41, 41]
+  - type: hline
+    line: [12, 43, 43]
+  - type: hline
+    line: [12, 45, 45]
+
+  # Row 13
+  - type: hline
+    line: [13, 3, 3]
+  - type: hline
+    line: [13, 5, 39]
+  - type: hline
+    line: [13, 41, 41]
+  - type: hline
+    line: [13, 43, 43]
+  - type: hline
+    line: [13, 45, 45]
+
+  # Row 14
+  - type: hline
+    line: [14, 3, 3]
+  - type: hline
+    line: [14, 41, 41]
+  - type: hline
+    line: [14, 43, 43]
+  - type: hline
+    line: [14, 45, 45]
+
+  # Row 15
+  - type: hline
+    line: [15, 3, 39]
+  - type: hline
+    line: [15, 41, 41]
+  - type: hline
+    line: [15, 43, 43]
+  - type: hline
+    line: [15, 45, 45]
+
+  # Row 16
+  - type: hline
+    line: [16, 41, 41]
+  - type: hline
+    line: [16, 43, 43]
+  - type: hline
+    line: [16, 45, 45]
+
+  # Row 17
+  - type: hline
+    line: [17, 3, 41]
+  - type: hline
+    line: [17, 43, 43]
+  - type: hline
+    line: [17, 45, 45]
+
+  # Row 18
+  - type: hline
+    line: [18, 43, 43]
+  - type: hline
+    line: [18, 45, 45]
+
+  # Row 19
+  - type: hline
+    line: [19, 3, 43]
+  - type: hline
+    line: [19, 45, 45]
+
+  # Row 20
+  - type: hline
+    line: [20, 45, 45]
+
+  # Row 21
+  - type: hline
+    line: [21, 3, 45]
+
+  # Row 23 - big horizontal wall
+  - type: hline
+    line: [23, 2, 45]
+
+  # Row 25
+  - type: hline
+    line: [25, 3, 46]
+
+  # Row 27
+  - type: hline
+    line: [27, 3, 45]
+
+  # Row 28
+  - type: hline
+    line: [28, 45, 45]
+
+  # Row 29
+  - type: hline
+    line: [29, 3, 43]
+  - type: hline
+    line: [29, 45, 45]
+
+  # Row 30
+  - type: hline
+    line: [30, 43, 43]
+  - type: hline
+    line: [30, 45, 45]
+
+  # Row 31
+  - type: hline
+    line: [31, 3, 41]
+  - type: hline
+    line: [31, 43, 43]
+  - type: hline
+    line: [31, 45, 45]
+
+  # Row 32
+  - type: hline
+    line: [32, 41, 41]
+  - type: hline
+    line: [32, 43, 43]
+  - type: hline
+    line: [32, 45, 45]
+
+  # Row 33
+  - type: hline
+    line: [33, 3, 39]
+  - type: hline
+    line: [33, 41, 41]
+  - type: hline
+    line: [33, 43, 43]
+  - type: hline
+    line: [33, 45, 45]
+
+  # Row 34
+  - type: hline
+    line: [34, 39, 39]
+  - type: hline
+    line: [34, 41, 41]
+  - type: hline
+    line: [34, 43, 43]
+  - type: hline
+    line: [34, 45, 45]
+
+  # Row 35
+  - type: hline
+    line: [35, 3, 37]
+  - type: hline
+    line: [35, 39, 39]
+  - type: hline
+    line: [35, 41, 41]
+  - type: hline
+    line: [35, 43, 43]
+  - type: hline
+    line: [35, 45, 45]
+
+  # Row 36
+  - type: hline
+    line: [36, 41, 41]

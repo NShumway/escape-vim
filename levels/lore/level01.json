@@ -1,0 +1,8 @@
+{
+  "title": "First Steps",
+  "description": "Learn hjkl movement.",
+  "objective": "Navigate to the exit and escape.",
+  "quote": "Every expert was once a beginner.\nEvery master was once a disaster.\n\nToday, you take your first steps.",
+  "victory_quote": "Well done, soldier. You've taken your\nfirst steps toward freedom.\n\nBut don't celebrate yet. The real\nchallenges lie ahead.",
+  "lore": "\"Soldier. You've been trapped inside\n the VIM editor. Many have entered.\n Few have escaped.\n\n I've seen recruits freeze at the\n sight of that blinking cursor. Watched\n them mash Escape until their fingers\n went numb. Some are still in there,\n typing :quit over and over, hoping\n something will change.\n\n But you're different. I can see it.\n\n Your mission: learn the ancient\n commands that will set you free.\n Move with purpose. Act with precision.\n And whatever you do...\n\n Don't panic.\"\n\n                    — The Commander"
+}

@@ -46,6 +46,8 @@ endfunction
 " Transition to a new game state
 " @param new_state: 'LORE' | 'GAMEPLAY' | 'FIREWORKS' | 'RESULTS'
 function! GameTransition(new_state)
+  call Debug_Log('GameTransition: ' . g:game_state . ' -> ' . a:new_state)
+
   " Stop any pending transition timer to prevent race conditions
   if s:transition_id != ''
     call Tick_Unsubscribe(s:transition_id)
@@ -60,6 +62,7 @@ function! GameTransition(new_state)
 
   " Enter new state
   call s:EnterState(a:new_state)
+  call Debug_Log('GameTransition: Entered ' . a:new_state)
 endfunction
 
 " Internal: Cleanup when leaving a state
@@ -195,12 +198,17 @@ endfunction
 
 " Start the game from the beginning (called on launch)
 function! Game_Start()
+  call Debug_Log('Game_Start: Initializing game')
+
   " Load manifest once and cache it
+  call Debug_Log('Game_Start: Loading manifest')
   let s:manifest_cache = eval(join(readfile('levels/manifest.vim'), ''))
+  call Debug_Log('Game_Start: Found ' . len(s:manifest_cache) . ' levels in manifest')
 
   " Load save data and cache completed levels
   let l:save = Save_Load()
   let s:completed_levels_cache = get(l:save, 'completed_levels', [])
+  call Debug_Log('Game_Start: Completed levels: ' . string(s:completed_levels_cache))
 
   " Invalidate commands cache (will rebuild on first access)
   let s:commands_cache_valid = 0
