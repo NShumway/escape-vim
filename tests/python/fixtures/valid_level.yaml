@@ -1,0 +1,25 @@
+id: 99
+dimensions: [5, 10]
+start: [2, 2]
+exit: [4, 9]
+commands:
+  - key: 'h'
+    desc: 'move left'
+  - key: 'l'
+    desc: 'move right'
+  - key: 'j'
+    desc: 'move down'
+  - key: 'k'
+    desc: 'move up'
+blocked_categories:
+  - insert
+walls:
+  - type: 'hline'
+    line: [1, 1, 10]
+  - type: 'hline'
+    line: [5, 1, 10]
+  - type: 'vline'
+    line: [1, 1, 5]
+  - type: 'vline'
+    line: [10, 1, 5]
+openings: []

@@ -1,0 +1,8 @@
+{
+  "title": "Test Level",
+  "description": "A test level for unit testing",
+  "objective": "Reach the exit",
+  "quote": "Testing is the path to quality.",
+  "victory_quote": "You passed the test!",
+  "lore": "This is a minimal test level used for automated testing."
+}
