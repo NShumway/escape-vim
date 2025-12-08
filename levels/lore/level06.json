@@ -1,0 +1,8 @@
+{
+  "title": "Redacted Intel",
+  "description": "Remove classified words from the document.",
+  "objective": "Delete the extra words to match the target, then save.",
+  "quote": "Sometimes information must be removed,\nnot added.\n\nLearn to delete efficiently.\nOne command can do the work of many.",
+  "victory_quote": "Document redacted successfully.\nClassified information secured.\n\nYou're becoming quite the editor.",
+  "lore": "This message contains sensitive information\nthat must be removed before transmission.\n\nDeleting character by character with 'x' is slow.\nUse 'dw' to delete entire words at once.\n\nPosition your cursor and strike efficiently."
+}

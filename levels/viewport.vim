@@ -109,7 +109,8 @@ function! ViewportPadBuffer()
     call append('$', l:bottom_lines)
   endif
 
-  setlocal nomodifiable
+  " Note: Don't set nomodifiable here - let the caller (Level_Load) decide
+  " based on level type (editing levels need to stay modifiable)
 
   " Apply the appropriate scrolling mode
   if s:scroll_mode

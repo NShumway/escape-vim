@@ -1,0 +1,9 @@
+Target:  Abort mission immediately.     
+         Enemy has compromised location.
+         Extract via north exit.        
+         Destroy all evidence.          
+───────────────────────────────────────────
+         Abort mision imediately.       
+         Enmey has compromized location.
+         Extraxt via the north exit.    
+         Destory all the evidence.       

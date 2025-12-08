@@ -1,0 +1,26 @@
+{
+  'type': 'editing',
+  'title': 'The Intercepted Message',
+  'description': 'Fix the corrupted spy message before transmission.',
+  'objective': 'Correct all typos in the message, then save and exit.',
+  'commands': [
+    {'key': 'h/j/k/l', 'desc': 'move'},
+    {'key': 'i', 'desc': 'insert mode'},
+    {'key': 'x', 'desc': 'delete char'},
+    {'key': 'Esc', 'desc': 'exit insert'},
+    {'key': ':wq', 'desc': 'save & exit'},
+  ],
+  'quote': "Every character matters.\nA single misplaced letter\ncould compromise the entire operation.\n\nFix the message. Lives depend on it.",
+  'victory_quote': "Message corrected and transmitted.\nThe operation proceeds as planned.\n\nYou're learning the art of precision.",
+  'start_cursor': [4, 10],
+  'exit_cursor': [5, 40],
+  'maze': {'lines': 5, 'cols': 42},
+  'viewport': {'lines': 5, 'cols': 42},
+  'blocked_categories': ['arrows', 'search', 'find_char', 'word_motion', 'line_jump', 'paragraph', 'matching', 'marks', 'jump_list', 'scroll', 'visual'],
+  'features': [],
+  'time_limit_seconds': v:null,
+  'max_keystrokes': v:null,
+  'editable_region': {'start_line': 4, 'end_line': 5, 'start_col': 10, 'end_col': 39},
+  'divider_line': 3,
+  'target_text': "The spy will meet at midnight.\nBring the documents."
+}

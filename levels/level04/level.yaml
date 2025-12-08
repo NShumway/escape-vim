@@ -1,0 +1,47 @@
+# Level 4: The Intercepted Message
+# First editing level - teaches i (insert) and x (delete char)
+
+id: 4
+type: editing
+
+# Target text (what the edited text should become)
+target_text: |
+  The spy will meet at midnight.
+  Bring the documents.
+
+# Initial text (what player starts with - has typos to fix)
+initial_text: |
+  The spy wil  meet at midnght.
+  Bring the documnts.
+
+# Player start position (defaults to start of editable region)
+# start: [3, 10]
+
+# Commands to teach (shown in UI)
+commands:
+  - key: 'h/j/k/l'
+    desc: 'move'
+  - key: 'i'
+    desc: 'insert mode'
+  - key: 'x'
+    desc: 'delete char'
+  - key: 'Esc'
+    desc: 'exit insert'
+  - key: ':wq'
+    desc: 'save & exit'
+
+# Don't block editing commands
+blocked_categories:
+  - arrows
+  - search
+  - find_char
+  - word_motion
+  - line_jump
+  - paragraph
+  - matching
+  - marks
+  - jump_list
+  - scroll
+  - visual
+
+features: []

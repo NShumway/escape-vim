@@ -1,0 +1,8 @@
+{
+  "title": "The Full Report",
+  "description": "Complete the mission report with all your editing skills.",
+  "objective": "Fix all errors using insert, delete char, and delete word.",
+  "quote": "You've learned the basics.\nNow apply them all together.\n\nA true operator adapts,\nchoosing the right tool for each task.",
+  "victory_quote": "Mission report filed successfully.\nCommand is impressed with your efficiency.\n\nYou've proven yourself a capable editor.\nBut the real test is yet to come...",
+  "lore": "The final mission report must be filed.\nIt's a mess of errors—some need insertion,\nothers deletion, some whole words removed.\n\nUse everything you've learned:\n- 'i' for missing characters\n- 'x' for extra characters\n- 'dw' for unnecessary words\n\nThis is your comprehensive test."
+}

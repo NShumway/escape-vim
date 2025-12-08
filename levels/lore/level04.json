@@ -1,0 +1,8 @@
+{
+  "title": "The Intercepted Message",
+  "description": "Fix the corrupted spy message before transmission.",
+  "objective": "Correct all typos in the message, then save and exit.",
+  "quote": "Every character matters.\nA single misplaced letter\ncould compromise the entire operation.\n\nFix the message. Lives depend on it.",
+  "victory_quote": "Message corrected and transmitted.\nThe operation proceeds as planned.\n\nYou're learning the art of precision.",
+  "lore": "We've intercepted an urgent message from one of our\nfield agents. The transmission was corrupted—\nsome letters are missing, others are wrong.\n\nYour task: fix the message before it's too late.\nUse 'i' to insert missing letters,\n'x' to delete incorrect ones.\n\nWhen the message is correct, save with :wq"
+}

@@ -1,4 +1,5 @@
 {
+  'type': 'maze',
   'title': 'The Watchers',
   'description': 'Evade patrolling spies to reach the exit.',
   'objective': 'Navigate past the guards without being detected.',

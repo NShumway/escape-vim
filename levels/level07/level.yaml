@@ -1,0 +1,47 @@
+# Level 7: The Full Report
+# Combined editing - uses all commands: i, x, dw
+
+id: 7
+type: editing
+
+# Target text (what the edited text should become)
+target_text: |
+  Mission Status: Complete
+  Assets recovered without incident.
+  Enemy forces were neutralized.
+  Extraction point secured.
+  Recommend immediate debrief.
+
+# Initial text (mix of missing chars, extra chars, extra words)
+initial_text: |
+  Misson Status: Complet
+  Assets recoverred without any incident.
+  Enmey forces were not neutralized.
+  Extracton point is secured.
+  Recomend immediate full debrief.
+
+commands:
+  - key: 'h/j/k/l'
+    desc: 'move'
+  - key: 'i'
+    desc: 'insert mode'
+  - key: 'x'
+    desc: 'delete char'
+  - key: 'dw'
+    desc: 'delete word'
+  - key: ':wq'
+    desc: 'save & exit'
+
+blocked_categories:
+  - arrows
+  - search
+  - find_char
+  - line_jump
+  - paragraph
+  - matching
+  - marks
+  - jump_list
+  - scroll
+  - visual
+
+features: []

@@ -1,0 +1,26 @@
+{
+  'type': 'editing',
+  'title': 'Under Pressure',
+  'description': 'Edit the urgent message while avoiding enemy patrols.',
+  'objective': 'Fix all errors quickly. Spies are watching!',
+  'commands': [
+    {'key': 'h/j/k/l', 'desc': 'move'},
+    {'key': 'i', 'desc': 'insert mode'},
+    {'key': 'x', 'desc': 'delete char'},
+    {'key': 'dw', 'desc': 'delete word'},
+    {'key': ':wq', 'desc': 'save & exit'},
+  ],
+  'quote': "The enemy is close.\nThere's no time for hesitation.\n\nEdit fast. Delete faster.\nOne wrong move and it's over.",
+  'victory_quote': "Message sent. Evidence destroyed.\nYou made it out just in time.\n\nYou've mastered the art of editing under fire.\nThe Commander will be pleased.",
+  'start_cursor': [6, 10],
+  'exit_cursor': [9, 41],
+  'maze': {'lines': 9, 'cols': 43},
+  'viewport': {'lines': 9, 'cols': 43},
+  'blocked_categories': ['arrows', 'search', 'find_char', 'line_jump', 'paragraph', 'matching', 'marks', 'jump_list', 'scroll', 'visual'],
+  'features': ['spies'],
+  'time_limit_seconds': v:null,
+  'max_keystrokes': v:null,
+  'editable_region': {'start_line': 6, 'end_line': 9, 'start_col': 10, 'end_col': 40},
+  'divider_line': 5,
+  'target_text': "Abort mission immediately.\nEnemy has compromised location.\nExtract via north exit.\nDestroy all evidence."
+}

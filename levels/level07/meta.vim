@@ -1,0 +1,26 @@
+{
+  'type': 'editing',
+  'title': 'The Full Report',
+  'description': 'Complete the mission report with all your editing skills.',
+  'objective': 'Fix all errors using insert, delete char, and delete word.',
+  'commands': [
+    {'key': 'h/j/k/l', 'desc': 'move'},
+    {'key': 'i', 'desc': 'insert mode'},
+    {'key': 'x', 'desc': 'delete char'},
+    {'key': 'dw', 'desc': 'delete word'},
+    {'key': ':wq', 'desc': 'save & exit'},
+  ],
+  'quote': "You've learned the basics.\nNow apply them all together.\n\nA true operator adapts,\nchoosing the right tool for each task.",
+  'victory_quote': "Mission report filed successfully.\nCommand is impressed with your efficiency.\n\nYou've proven yourself a capable editor.\nBut the real test is yet to come...",
+  'start_cursor': [7, 10],
+  'exit_cursor': [11, 49],
+  'maze': {'lines': 11, 'cols': 51},
+  'viewport': {'lines': 11, 'cols': 51},
+  'blocked_categories': ['arrows', 'search', 'find_char', 'line_jump', 'paragraph', 'matching', 'marks', 'jump_list', 'scroll', 'visual'],
+  'features': [],
+  'time_limit_seconds': v:null,
+  'max_keystrokes': v:null,
+  'editable_region': {'start_line': 7, 'end_line': 11, 'start_col': 10, 'end_col': 48},
+  'divider_line': 6,
+  'target_text': "Mission Status: Complete\nAssets recovered without incident.\nEnemy forces were neutralized.\nExtraction point secured.\nRecommend immediate debrief."
+}

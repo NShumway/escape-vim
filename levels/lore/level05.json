@@ -1,0 +1,8 @@
+{
+  "title": "Encoded Orders",
+  "description": "Decode and correct the scrambled transmission.",
+  "objective": "Fix all errors in the message, then save and exit.",
+  "quote": "The enemy's interference grows stronger.\nMore errors slip through with each transmission.\n\nStay focused. Every correction counts.",
+  "victory_quote": "Orders decoded and relayed.\nAgent Delta is en route.\n\nYour attention to detail is impressive.",
+  "lore": "Another urgent transmission has come through,\nbut enemy jamming has corrupted the signal.\n\nThis one is longer and more garbled than before.\nUse what you've learned: 'i' to insert, 'x' to delete.\n\nThe operation depends on accurate intel."
+}

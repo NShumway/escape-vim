@@ -1,0 +1,44 @@
+# Level 5: Encoded Orders
+# More editing practice with i and x - longer text, more errors
+
+id: 5
+type: editing
+
+# Target text (what the edited text should become)
+target_text: |
+  Agent Delta will arrive at dawn.
+  Meet at the old warehouse.
+  Password is nightfall.
+
+# Initial text (has more typos and errors to fix)
+initial_text: |
+  Agent Deltaa will  arive at dawn.
+  Meet at teh old warehuose.
+  Pasword is nightfal .
+
+commands:
+  - key: 'h/j/k/l'
+    desc: 'move'
+  - key: 'i'
+    desc: 'insert mode'
+  - key: 'x'
+    desc: 'delete char'
+  - key: 'Esc'
+    desc: 'exit insert'
+  - key: ':wq'
+    desc: 'save & exit'
+
+blocked_categories:
+  - arrows
+  - search
+  - find_char
+  - word_motion
+  - line_jump
+  - paragraph
+  - matching
+  - marks
+  - jump_list
+  - scroll
+  - visual
+
+features: []

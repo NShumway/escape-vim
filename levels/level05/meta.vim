@@ -1,0 +1,26 @@
+{
+  'type': 'editing',
+  'title': 'Encoded Orders',
+  'description': 'Decode and correct the scrambled transmission.',
+  'objective': 'Fix all errors in the message, then save and exit.',
+  'commands': [
+    {'key': 'h/j/k/l', 'desc': 'move'},
+    {'key': 'i', 'desc': 'insert mode'},
+    {'key': 'x', 'desc': 'delete char'},
+    {'key': 'Esc', 'desc': 'exit insert'},
+    {'key': ':wq', 'desc': 'save & exit'},
+  ],
+  'quote': "The enemy's interference grows stronger.\nMore errors slip through with each transmission.\n\nStay focused. Every correction counts.",
+  'victory_quote': "Orders decoded and relayed.\nAgent Delta is en route.\n\nYour attention to detail is impressive.",
+  'start_cursor': [5, 10],
+  'exit_cursor': [7, 43],
+  'maze': {'lines': 7, 'cols': 45},
+  'viewport': {'lines': 7, 'cols': 45},
+  'blocked_categories': ['arrows', 'search', 'find_char', 'word_motion', 'line_jump', 'paragraph', 'matching', 'marks', 'jump_list', 'scroll', 'visual'],
+  'features': [],
+  'time_limit_seconds': v:null,
+  'max_keystrokes': v:null,
+  'editable_region': {'start_line': 5, 'end_line': 7, 'start_col': 10, 'end_col': 42},
+  'divider_line': 4,
+  'target_text': "Agent Delta will arrive at dawn.\nMeet at the old warehouse.\nPassword is nightfall."
+}

@@ -26,6 +26,8 @@ from typing import List, Tuple, Dict, Any, Optional
 
 WALL_CHAR = '█'
 FLOOR_CHAR = ' '
+DIVIDER_CHAR = '─'
+EXIT_CHAR = '*'
 
 
 def generate_maze(config: Dict[str, Any]) -> List[str]:
@@ -114,6 +116,95 @@ def generate_maze(config: Dict[str, Any]) -> List[str]:
             grid[exit_row][exit_col] = 'Q'
 
     return [''.join(row) for row in grid]
+
+
+def generate_editing_document(config: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
+    """Generate the document for an editing level.
+
+    Returns tuple of (document_lines, region_info) where region_info contains
+    editable_region bounds and other metadata for meta.vim.
+    """
+    target_text = config.get('target_text', '').rstrip('\n')
+    initial_text = config.get('initial_text', '').rstrip('\n')
+
+    target_lines = target_text.split('\n')
+    initial_lines = initial_text.split('\n')
+
+    # Ensure same number of lines
+    max_lines = max(len(target_lines), len(initial_lines))
+    while len(target_lines) < max_lines:
+        target_lines.append('')
+    while len(initial_lines) < max_lines:
+        initial_lines.append('')
+
+    # Calculate widths
+    # Label prefix for target section
+    label_prefix = "Target:  "
+    label_width = len(label_prefix)
+
+    # Find max width needed
+    max_target_width = max(len(line) for line in target_lines) if target_lines else 0
+    max_initial_width = max(len(line) for line in initial_lines) if initial_lines else 0
+    content_width = max(max_target_width, max_initial_width)
+
+    # Exit tile position config
+    exit_config = config.get('exit', 'right')
+
+    # Build document lines
+    document = []
+
+    # Target section (read-only reference)
+    for i, line in enumerate(target_lines):
+        if i == 0:
+            # First line has "Target:  " prefix
+            padded = line.ljust(content_width)
+            document.append(f"{label_prefix}{padded}")
+        else:
+            # Subsequent lines align with first
+            padded = line.ljust(content_width)
+            document.append(f"{' ' * label_width}{padded}")
+
+    # Divider line
+    divider_width = label_width + content_width + 3  # +3 for exit tile area
+    divider_line = DIVIDER_CHAR * divider_width
+    document.append(divider_line)
+    divider_line_num = len(document)  # 1-indexed
+
+    # Editable section
+    editable_start_line = len(document) + 1  # 1-indexed
+    editable_start_col = label_width + 1  # 1-indexed, after the label-width padding
+
+    for i, line in enumerate(initial_lines):
+        # Pad to align with target section
+        padded = line.ljust(content_width)
+
+        # Add space for exit tile at end of last line (highlight shows the exit, not a character)
+        if i == len(initial_lines) - 1:
+            document.append(f"{' ' * label_width}{padded} ")
+        else:
+            document.append(f"{' ' * label_width}{padded}")
+
+    editable_end_line = len(document)  # 1-indexed
+    editable_end_col = label_width + content_width  # 1-indexed
+
+    # Calculate exit position (1-indexed)
+    exit_line = editable_end_line
+    exit_col = label_width + content_width + 1  # Position of EXIT_CHAR
+
+    # Region info for meta.vim
+    region_info = {
+        'editable_region': {
+            'start_line': editable_start_line,
+            'end_line': editable_end_line,
+            'start_col': editable_start_col,
+            'end_col': editable_end_col,
+        },
+        'divider_line': divider_line_num,
+        'exit_cursor': [exit_line, exit_col],
+        'dimensions': [len(document), divider_width],
+    }
+
+    return document, region_info
 
 
 def generate_patrol_route(spy_config: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -394,15 +485,20 @@ def format_vim_value(value: Any, indent: int = 0) -> str:
         raise ValueError(f"Cannot format value of type {type(value)}: {value}")
 
 
-def generate_meta_vim(config: Dict[str, Any], lore: Dict[str, Any]) -> str:
+def generate_meta_vim(config: Dict[str, Any], lore: Dict[str, Any], editing_info: Optional[Dict[str, Any]] = None) -> str:
     """Generate meta.vim content from YAML config and lore JSON.
 
     Merges:
     - From YAML: dimensions, start, exit, viewport, commands, blocked_categories, features
     - From lore JSON: title, description, objective, quote, victory_quote, lore
+    - For editing levels: editable_region, target_text, divider_line from editing_info
     """
     # Build the meta dictionary
     meta = {}
+
+    # Level type
+    level_type = config.get('type', 'maze')
+    meta['type'] = level_type
 
     # From lore JSON
     meta['title'] = lore.get('title', 'Untitled Level')
@@ -417,20 +513,38 @@ def generate_meta_vim(config: Dict[str, Any], lore: Dict[str, Any]) -> str:
     meta['quote'] = lore.get('quote', '')
     meta['victory_quote'] = lore.get('victory_quote', '')
 
-    # Cursor positions (convert from 1-indexed YAML to Vim 1-indexed format)
-    # YAML uses [row, col], Vim expects [line, col] which is the same
-    start = config.get('start', [1, 1])
-    exit_pos = config.get('exit', [1, 1])
-    meta['start_cursor'] = start
-    meta['exit_cursor'] = exit_pos
+    # For editing levels, use info from editing_info; for maze levels, use config
+    if level_type == 'editing' and editing_info:
+        # Cursor positions from editing document generator
+        start = config.get('start', [editing_info['editable_region']['start_line'],
+                                      editing_info['editable_region']['start_col']])
+        meta['start_cursor'] = start
+        meta['exit_cursor'] = editing_info['exit_cursor']
 
-    # Maze dimensions
-    dims = config.get('dimensions', [25, 80])
-    meta['maze'] = {'lines': dims[0], 'cols': dims[1]}
+        # Document dimensions
+        dims = editing_info['dimensions']
+        meta['maze'] = {'lines': dims[0], 'cols': dims[1]}
+        meta['viewport'] = {'lines': dims[0], 'cols': dims[1]}
 
-    # Viewport - defaults to maze dimensions if not specified
-    viewport = config.get('viewport', dims)
-    meta['viewport'] = {'lines': viewport[0], 'cols': viewport[1]}
+        # Editing-specific metadata
+        meta['editable_region'] = editing_info['editable_region']
+        meta['divider_line'] = editing_info['divider_line']
+        meta['target_text'] = config.get('target_text', '').rstrip('\n')
+    else:
+        # Cursor positions (convert from 1-indexed YAML to Vim 1-indexed format)
+        # YAML uses [row, col], Vim expects [line, col] which is the same
+        start = config.get('start', [1, 1])
+        exit_pos = config.get('exit', [1, 1])
+        meta['start_cursor'] = start
+        meta['exit_cursor'] = exit_pos
+
+        # Maze dimensions
+        dims = config.get('dimensions', [25, 80])
+        meta['maze'] = {'lines': dims[0], 'cols': dims[1]}
+
+        # Viewport - defaults to maze dimensions if not specified
+        viewport = config.get('viewport', dims)
+        meta['viewport'] = {'lines': viewport[0], 'cols': viewport[1]}
 
     # Blocked categories
     meta['blocked_categories'] = config.get('blocked_categories', [])
@@ -451,9 +565,10 @@ def generate_meta_vim(config: Dict[str, Any], lore: Dict[str, Any]) -> str:
     # Format each key in a consistent order
     # Note: 'lore' deliberately excluded - read from JSON by lore.vim
     key_order = [
-        'title', 'description', 'objective', 'commands', 'quote', 'victory_quote',
+        'type', 'title', 'description', 'objective', 'commands', 'quote', 'victory_quote',
         'start_cursor', 'exit_cursor', 'maze', 'viewport', 'blocked_categories',
-        'features', 'time_limit_seconds', 'max_keystrokes'
+        'features', 'time_limit_seconds', 'max_keystrokes',
+        'editable_region', 'divider_line', 'target_text'
     ]
 
     # Build list of formatted items
@@ -569,63 +684,109 @@ def build_level(level_dir: Path) -> bool:
     # Load lore
     lore = load_lore_json(level_dir, level_id)
 
-    # Generate maze
-    maze = generate_maze(config)
-
-    # Generate meta.vim
-    meta_vim = generate_meta_vim(config, lore)
-
-    # Generate and validate spies
-    spies_vim, errors = generate_spies_vim(config.get('spies', []), maze)
-
-    if errors:
-        print("VALIDATION ERRORS:")
-        for err in errors:
-            print(f"  - {err}")
-        print()
+    # Determine level type
+    level_type = config.get('type', 'maze')
+    errors = []
 
     # Output paths
     maze_path = level_dir / 'maze.txt'
     meta_path = level_dir / 'meta.vim'
     spies_path = level_dir / 'spies.vim'
 
-    # Write maze
-    with open(maze_path, 'w') as f:
-        f.write('\n'.join(maze))
-    print(f"Written: {maze_path}")
+    if level_type == 'editing':
+        # Generate editing document
+        document, editing_info = generate_editing_document(config)
 
-    # Write meta.vim
-    with open(meta_path, 'w') as f:
-        f.write(meta_vim)
-    print(f"Written: {meta_path}")
+        # Generate meta.vim with editing info
+        meta_vim = generate_meta_vim(config, lore, editing_info)
 
-    # Write spies.vim if there are spies
-    if config.get('spies'):
-        with open(spies_path, 'w') as f:
-            f.write(spies_vim)
-        print(f"Written: {spies_path}")
+        # Write document as maze.txt (reusing the filename for consistency)
+        with open(maze_path, 'w') as f:
+            f.write('\n'.join(document))
+        print(f"Written: {maze_path}")
+
+        # Write meta.vim
+        with open(meta_path, 'w') as f:
+            f.write(meta_vim)
+        print(f"Written: {meta_path}")
+
+        # Generate spies if defined (for level 8)
+        if config.get('spies'):
+            spies_vim, spy_errors = generate_spies_vim(config.get('spies', []), document)
+            errors.extend(spy_errors)
+            with open(spies_path, 'w') as f:
+                f.write(spies_vim)
+            print(f"Written: {spies_path}")
+
+        # Print summary
+        print(f"\n=== Summary (Editing Level) ===")
+        print(f"Level ID: {level_id}")
+        print(f"Title: {lore.get('title', 'Unknown')}")
+        print(f"Type: {level_type}")
+        print(f"Dimensions: {editing_info['dimensions'][0]} rows x {editing_info['dimensions'][1]} cols")
+        print(f"Editable region: lines {editing_info['editable_region']['start_line']}-{editing_info['editable_region']['end_line']}")
+        print(f"Exit: {editing_info['exit_cursor']}")
+        print(f"Features: {config.get('features', [])}")
+        print(f"Spies: {len(config.get('spies', []))}")
+
+        # Show document preview
+        print("\n=== Document Preview ===\n")
+        for line in document:
+            print(line)
+        print()
+
     else:
-        print(f"No spies defined, skipping {spies_path}")
+        # Standard maze level
+        maze = generate_maze(config)
 
-    # Print summary
-    print(f"\n=== Summary ===")
-    print(f"Level ID: {level_id}")
-    print(f"Title: {lore.get('title', 'Unknown')}")
-    print(f"Dimensions: {config['dimensions'][0]} rows x {config['dimensions'][1]} cols")
-    print(f"Start: {config.get('start', 'not set')}")
-    print(f"Exit: {config.get('exit', 'not set')}")
-    print(f"Features: {config.get('features', [])}")
-    print(f"Spies: {len(config.get('spies', []))}")
+        # Generate meta.vim
+        meta_vim = generate_meta_vim(config, lore)
+
+        # Generate and validate spies
+        spies_vim, spy_errors = generate_spies_vim(config.get('spies', []), maze)
+        errors.extend(spy_errors)
+
+        # Write maze
+        with open(maze_path, 'w') as f:
+            f.write('\n'.join(maze))
+        print(f"Written: {maze_path}")
+
+        # Write meta.vim
+        with open(meta_path, 'w') as f:
+            f.write(meta_vim)
+        print(f"Written: {meta_path}")
+
+        # Write spies.vim if there are spies
+        if config.get('spies'):
+            with open(spies_path, 'w') as f:
+                f.write(spies_vim)
+            print(f"Written: {spies_path}")
+        else:
+            print(f"No spies defined, skipping {spies_path}")
+
+        # Print summary
+        print(f"\n=== Summary ===")
+        print(f"Level ID: {level_id}")
+        print(f"Title: {lore.get('title', 'Unknown')}")
+        print(f"Type: {level_type}")
+        print(f"Dimensions: {config['dimensions'][0]} rows x {config['dimensions'][1]} cols")
+        print(f"Start: {config.get('start', 'not set')}")
+        print(f"Exit: {config.get('exit', 'not set')}")
+        print(f"Features: {config.get('features', [])}")
+        print(f"Spies: {len(config.get('spies', []))}")
+
+        # Show preview
+        print_preview(maze, config)
 
     if errors:
+        print("VALIDATION ERRORS:")
+        for err in errors:
+            print(f"  - {err}")
         print(f"\n⚠️  {len(errors)} validation error(s) found!")
         return False
     else:
         print(f"\n✓ All validations passed")
-
-    # Show preview
-    print_preview(maze, config)
-    return True
+        return True
 
 
 def print_preview(maze: List[str], config: Dict[str, Any]) -> None:

@@ -1,0 +1,43 @@
+# Level 6: Redacted Intel
+# Introduces dw (delete word) command
+
+id: 6
+type: editing
+
+# Target text (what the edited text should become)
+target_text: |
+  The package arrives Tuesday.
+  Contact is at the hotel.
+  Proceed with caution.
+
+# Initial text (has extra words that need to be deleted)
+initial_text: |
+  The secret package arrives next Tuesday.
+  Contact agent is at the old hotel.
+  Proceed immediately with extreme caution.
+
+commands:
+  - key: 'h/j/k/l'
+    desc: 'move'
+  - key: 'i'
+    desc: 'insert mode'
+  - key: 'x'
+    desc: 'delete char'
+  - key: 'dw'
+    desc: 'delete word'
+  - key: ':wq'
+    desc: 'save & exit'
+
+blocked_categories:
+  - arrows
+  - search
+  - find_char
+  - line_jump
+  - paragraph
+  - matching
+  - marks
+  - jump_list
+  - scroll
+  - visual
+
+features: []

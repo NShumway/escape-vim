@@ -1,0 +1,8 @@
+{
+  "title": "Under Pressure",
+  "description": "Edit the urgent message while avoiding enemy patrols.",
+  "objective": "Fix all errors quickly. Spies are watching!",
+  "quote": "The enemy is close.\nThere's no time for hesitation.\n\nEdit fast. Delete faster.\nOne wrong move and it's over.",
+  "victory_quote": "Message sent. Evidence destroyed.\nYou made it out just in time.\n\nYou've mastered the art of editing under fire.\nThe Commander will be pleased.",
+  "lore": "URGENT: Enemy patrols have been spotted\nin the communications room.\n\nYou must correct this critical message\nbefore they find you.\n\nUse 'dw' to delete words quickly—\nit's faster than repeated 'x' presses.\n\nTime is not on your side."
+}

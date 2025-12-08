@@ -5,6 +5,7 @@
 let s:current_meta = {}
 let s:exit_pos = [0, 0]  " character coordinates
 let s:level_path = ''
+let s:level_type = ''    " 'maze' or 'editing'
 
 " Load a level from a directory path
 " @param level_path: path to level directory (e.g., 'levels/level01')
@@ -22,6 +23,7 @@ function! Level_Load(level_path)
   source levels/api/collision.vim
   source levels/api/patrol.vim
   source levels/api/enemy.vim
+  source levels/api/editing.vim
   call Debug_Log('Level_Load: APIs loaded')
 
   " 2. Load viewport system
@@ -39,10 +41,14 @@ function! Level_Load(level_path)
     throw 'Level_Load: ' . v:exception
   endtry
 
-  " 4. Initialize viewport
+  " 4. Determine level type
+  let s:level_type = get(s:current_meta, 'type', 'maze')
+  call Debug_Log('Level_Load: Level type=' . s:level_type)
+
+  " 5. Initialize viewport
   call ViewportInit(s:current_meta)
 
-  " 5. Load the maze file (force reload from disk)
+  " 6. Load the maze/document file (force reload from disk)
   let l:maze_path = a:level_path . '/maze.txt'
   " Delete any existing buffer for this file to ensure fresh load
   let l:bufnr = bufnr(l:maze_path)
@@ -70,11 +76,34 @@ function! Level_Load(level_path)
   let l:exit_byte = Pos_CharToBytes(s:exit_pos[0], s:exit_pos[1])
   call gamesetexit(s:exit_pos[0], l:exit_byte)
 
-  " 9. Initialize player and collision tracking
+  " 9. Enable editing mode BEFORE player init (so @ isn't drawn to buffer)
+  if s:level_type == 'editing'
+    call Player_EnableEditingMode()
+  endif
+
+  " 10. Initialize player and collision tracking
   call Player_Init(l:start_line, l:start_col)
   call Collision_SetLastValidPos(l:start_line, l:start_col)
 
-  " 10. Set up input blocking based on level config
+  " 11. Initialize editing level (editable region, mappings, etc.)
+  if s:level_type == 'editing'
+    " Adjust editable region for viewport padding
+    let l:region = get(s:current_meta, 'editable_region', {})
+    if !empty(l:region)
+      let l:adjusted_region = {
+            \ 'start_line': l:region.start_line + l:pad_top,
+            \ 'end_line': l:region.end_line + l:pad_top,
+            \ 'start_col': l:region.start_col + l:pad_left,
+            \ 'end_col': l:region.end_col + l:pad_left
+            \ }
+      let l:adjusted_meta = copy(s:current_meta)
+      let l:adjusted_meta.editable_region = l:adjusted_region
+      let l:adjusted_meta.exit_cursor = s:exit_pos
+      call Editing_Init(l:adjusted_meta)
+    endif
+  endif
+
+  " 11. Set up input blocking based on level config
   let l:blocked = get(s:current_meta, 'blocked_categories',
         \ ['arrows', 'search', 'find_char', 'word_motion', 'line_jump',
         \  'paragraph', 'matching', 'marks', 'jump_list', 'scroll'])
@@ -92,9 +121,19 @@ function! Level_Load(level_path)
   nnoremap <buffer> <silent> ZZ :call <SID>GameTryQuit()<CR>
   nnoremap <buffer> <silent> ZQ :call <SID>GameTryQuit()<CR>
 
-  " 13. Lock buffer and set UI options
-  setlocal nomodifiable
-  call s:SetupUI()
+  " 13. Set up :wq, :x, :q command handling for editing levels
+  " These intercept the command-line commands and route to our handler
+  cnoremap <buffer> <silent> wq<CR> <C-u>call <SID>HandleSaveQuit()<CR>
+  cnoremap <buffer> <silent> x<CR> <C-u>call <SID>HandleSaveQuit()<CR>
+  cnoremap <buffer> <silent> q<CR> <C-u>call <SID>HandleQuit()<CR>
+  cnoremap <buffer> <silent> q!<CR> <C-u>call <SID>HandleForceQuit()<CR>
+
+  " 14. Lock buffer and set UI options
+  " Only lock buffer for maze levels - editing levels need modifiable buffer
+  if s:level_type != 'editing'
+    setlocal nomodifiable
+  endif
+  call s:SetupUI(s:level_type)
 
   " 14. Load and spawn spies if spies.vim exists
   let l:spies_path = a:level_path . '/spies.vim'
@@ -156,13 +195,83 @@ endfunction
 " Internal: Try to quit (only works at exit position)
 function! s:GameTryQuit()
   if Level_AtExit()
-    quit!
+    call s:HandleExit()
   endif
   " Silent block if not at exit
 endfunction
 
+" Internal: Handle :q (quit without saving)
+function! s:HandleQuit()
+  if s:level_type == 'editing'
+    " Editing levels require :wq - show error like real Vim
+    echohl ErrorMsg
+    echo "E37: No write since last change (add ! to override)"
+    echohl None
+  else
+    " Normal maze level - just try to quit
+    call s:GameTryQuit()
+  endif
+endfunction
+
+" Internal: Handle :q! (force quit)
+function! s:HandleForceQuit()
+  " Force quit = level failed (abandoned changes)
+  if exists('*Game_LevelFailed')
+    call Game_LevelFailed()
+  else
+    quit!
+  endif
+endfunction
+
+" Internal: Handle save and quit (:wq or :x) for editing levels
+function! s:HandleSaveQuit()
+  if s:level_type == 'editing'
+    if Level_AtExit()
+      call s:HandleExit()
+    else
+      " For editing levels, :wq at exit checks match
+      " If not at exit, flash error
+      let [l:line, l:col] = Pos_GetCursor()
+      call Highlight_AddTimed('ErrorCell', l:line, l:col, 200)
+    endif
+  else
+    " Normal maze level - just try to quit
+    call s:GameTryQuit()
+  endif
+endfunction
+
+" Internal: Handle level exit (win/lose check for editing levels)
+function! s:HandleExit()
+  if s:level_type == 'editing'
+    if Editing_CheckMatch()
+      " Win - text matches target
+      if exists('*Game_LevelComplete')
+        call Game_LevelComplete()
+      else
+        quit!
+      endif
+    else
+      " Lose - text doesn't match
+      if exists('*Game_LevelFailed')
+        call Game_LevelFailed()
+      else
+        " Flash error and don't quit
+        call Highlight_AddTimed('ErrorCell', s:exit_pos[0], s:exit_pos[1], 300)
+      endif
+    endif
+  else
+    " Normal maze level - win!
+    if exists('*Game_LevelComplete')
+      call Game_LevelComplete()
+    else
+      quit!
+    endif
+  endif
+endfunction
+
 " Internal: Set up clean UI
-function! s:SetupUI()
+" @param level_type: 'maze' or 'editing'
+function! s:SetupUI(level_type)
   set laststatus=0
   set noshowcmd
   set noshowmode
@@ -171,15 +280,24 @@ function! s:SetupUI()
   set cmdheight=1
   set mouse=
 
-  " Hide the terminal cursor - let PlayerChar highlight be the visual indicator
+  " Hide the terminal cursor for maze levels - let PlayerChar highlight be the visual indicator
   " This makes the @ appear with proper white-on-black highlighting
-  set t_ve=
+  " For editing levels, show the cursor so users can see where they're typing
+  if a:level_type != 'editing'
+    set t_ve=
+  endif
 endfunction
 
 " Get the current level's metadata
 " @return: metadata dictionary
 function! Level_GetMeta()
   return copy(s:current_meta)
+endfunction
+
+" Get the current level type ('maze' or 'editing')
+" @return: string level type
+function! Level_GetType()
+  return s:level_type
 endfunction
 
 " Check if player is at the exit position
@@ -216,6 +334,9 @@ function! Level_Cleanup()
   if exists('*Collision_Cleanup')
     call Collision_Cleanup()
   endif
+  if exists('*Editing_Cleanup')
+    call Editing_Cleanup()
+  endif
 
   " Restore viewport settings
   if exists('*ViewportDisableCenter')
@@ -226,6 +347,7 @@ function! Level_Cleanup()
   let s:current_meta = {}
   let s:exit_pos = [0, 0]
   let s:level_path = ''
+  let s:level_type = ''
 endfunction
 
 " Attempt to quit the level (only succeeds if at exit)

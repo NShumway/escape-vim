@@ -1,0 +1,26 @@
+{
+  'type': 'editing',
+  'title': 'Redacted Intel',
+  'description': 'Remove classified words from the document.',
+  'objective': 'Delete the extra words to match the target, then save.',
+  'commands': [
+    {'key': 'h/j/k/l', 'desc': 'move'},
+    {'key': 'i', 'desc': 'insert mode'},
+    {'key': 'x', 'desc': 'delete char'},
+    {'key': 'dw', 'desc': 'delete word'},
+    {'key': ':wq', 'desc': 'save & exit'},
+  ],
+  'quote': "Sometimes information must be removed,\nnot added.\n\nLearn to delete efficiently.\nOne command can do the work of many.",
+  'victory_quote': "Document redacted successfully.\nClassified information secured.\n\nYou're becoming quite the editor.",
+  'start_cursor': [5, 10],
+  'exit_cursor': [7, 51],
+  'maze': {'lines': 7, 'cols': 53},
+  'viewport': {'lines': 7, 'cols': 53},
+  'blocked_categories': ['arrows', 'search', 'find_char', 'line_jump', 'paragraph', 'matching', 'marks', 'jump_list', 'scroll', 'visual'],
+  'features': [],
+  'time_limit_seconds': v:null,
+  'max_keystrokes': v:null,
+  'editable_region': {'start_line': 5, 'end_line': 7, 'start_col': 10, 'end_col': 50},
+  'divider_line': 4,
+  'target_text': "The package arrives Tuesday.\nContact is at the hotel.\nProceed with caution."
+}

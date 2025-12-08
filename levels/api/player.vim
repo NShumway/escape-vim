@@ -6,6 +6,7 @@ let s:player_char = '@'
 let s:floor_char = ' '
 let s:player_pos = [0, 0]      " [line, char_col] in character coordinates
 let s:player_highlight_id = 0
+let s:editing_mode = 0         " If 1, use color-only rendering (don't change char)
 
 " Tick-governed movement state
 let s:movement_queue = ''       " Most recent queued direction: 'h', 'j', 'k', 'l', or ''
@@ -15,13 +16,19 @@ let s:tick_movement_enabled = 0 " Whether to use tick-based movement
 
 " Internal: draw player at current position
 function! s:DrawPlayer()
-  call Buffer_SetChar(s:player_pos[0], s:player_pos[1], s:player_char)
+  " In editing mode, only apply highlight (don't change the character)
+  " This lets the player "become" the letter they're standing on visually
+  if !s:editing_mode
+    call Buffer_SetChar(s:player_pos[0], s:player_pos[1], s:player_char)
+  endif
 
   " Update highlight
   if s:player_highlight_id
     call Highlight_Remove(s:player_highlight_id)
   endif
-  let s:player_highlight_id = Highlight_Add('PlayerChar', s:player_pos[0], s:player_pos[1])
+  " Use different highlight for editing mode (more visible yellow) vs maze mode (white on black)
+  let l:highlight_group = s:editing_mode ? 'EditingCursor' : 'PlayerChar'
+  let s:player_highlight_id = Highlight_Add(l:highlight_group, s:player_pos[0], s:player_pos[1])
 endfunction
 
 " Initialize player at a character position
@@ -44,8 +51,8 @@ endfunction
 " @param line_num: new line
 " @param char_col: new character column
 function! Player_MoveTo(line_num, char_col)
-  " Clear old position
-  if s:player_pos[0] > 0
+  " Clear old position (only in non-editing mode where we draw @)
+  if s:player_pos[0] > 0 && !s:editing_mode
     call Buffer_SetChar(s:player_pos[0], s:player_pos[1], s:floor_char)
   endif
 
@@ -73,6 +80,22 @@ function! Player_SetFloorChar(char)
   let s:floor_char = a:char
 endfunction
 
+" Enable editing mode (color-only rendering, don't change characters)
+" Used for editing levels where player moves over text
+function! Player_EnableEditingMode()
+  let s:editing_mode = 1
+endfunction
+
+" Disable editing mode (back to @ rendering)
+function! Player_DisableEditingMode()
+  let s:editing_mode = 0
+endfunction
+
+" Check if editing mode is enabled
+function! Player_IsEditingMode()
+  return s:editing_mode
+endfunction
+
 " Reset player state (call when leaving level)
 function! Player_Cleanup()
   if s:player_highlight_id
@@ -85,6 +108,9 @@ function! Player_Cleanup()
   let s:tick_movement_enabled = 0
   let s:movement_queue = ''
   let s:last_move_tick = 0
+
+  " Reset editing mode
+  let s:editing_mode = 0
 endfunction
 
 " ============================================================================

@@ -154,8 +154,10 @@ function! s:OnTick(timer)
       let l:keep = l:sub.Callback(s:current_tick)
 
       if l:keep
-        " Update last fired tick
-        let s:subscribers[l:id].last_fired_tick = s:current_tick
+        " Update last fired tick (guard: subscriber may have been removed by another callback)
+        if has_key(s:subscribers, l:id)
+          let s:subscribers[l:id].last_fired_tick = s:current_tick
+        endif
       else
         " Callback returned 0, schedule for removal
         call add(l:to_remove, l:id)

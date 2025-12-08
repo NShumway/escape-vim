@@ -1,0 +1,59 @@
+# Level 8: Under Pressure
+# Editing with spy patrols - must edit quickly to avoid capture
+
+id: 8
+type: editing
+
+# Target text (what the edited text should become)
+target_text: |
+  Abort mission immediately.
+  Enemy has compromised location.
+  Extract via north exit.
+  Destroy all evidence.
+
+# Initial text (errors to fix while avoiding spies)
+initial_text: |
+  Abort mision imediately.
+  Enmey has compromized location.
+  Extraxt via the north exit.
+  Destory all the evidence.
+
+commands:
+  - key: 'h/j/k/l'
+    desc: 'move'
+  - key: 'i'
+    desc: 'insert mode'
+  - key: 'x'
+    desc: 'delete char'
+  - key: 'dw'
+    desc: 'delete word'
+  - key: ':wq'
+    desc: 'save & exit'
+
+blocked_categories:
+  - arrows
+  - search
+  - find_char
+  - line_jump
+  - paragraph
+  - matching
+  - marks
+  - jump_list
+  - scroll
+  - visual
+
+features:
+  - spies
+
+# Spies patrol horizontally through the text
+# Positions are relative to the generated document (after header + divider)
+spies:
+  - id: patrol_top
+    pattern: horizontal
+    endpoints: [[5, 10], [5, 35]]
+    speed: 0.6
+
+  - id: patrol_bottom
+    pattern: horizontal
+    endpoints: [[8, 35], [8, 10]]
+    speed: 0.7

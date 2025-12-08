@@ -1,0 +1,7 @@
+Target:  The package arrives Tuesday.             
+         Contact is at the hotel.                 
+         Proceed with caution.                    
+─────────────────────────────────────────────────────
+         The secret package arrives next Tuesday. 
+         Contact agent is at the old hotel.       
+         Proceed immediately with extreme caution. 

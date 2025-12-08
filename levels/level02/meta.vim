@@ -1,4 +1,5 @@
 {
+  'type': 'maze',
   'title': 'The Maze',
   'description': 'Learn hjkl and basic mode switching.',
   'objective': 'Navigate to the exit and escape.',

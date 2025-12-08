@@ -1,4 +1,5 @@
 {
+  'type': 'maze',
   'title': 'First Steps',
   'description': 'Learn hjkl movement.',
   'objective': 'Navigate to the exit and escape.',

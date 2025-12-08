@@ -1,0 +1,11 @@
+Target:  Mission Status: Complete               
+         Assets recovered without incident.     
+         Enemy forces were neutralized.         
+         Extraction point secured.              
+         Recommend immediate debrief.           
+───────────────────────────────────────────────────
+         Misson Status: Complet                 
+         Assets recoverred without any incident.
+         Enmey forces were not neutralized.     
+         Extracton point is secured.            
+         Recomend immediate full debrief.        

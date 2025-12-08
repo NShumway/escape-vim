@@ -7,6 +7,8 @@ let s:active_highlights = {}  " id -> {group, line, col}
 " Define standard highlight groups
 highlight ErrorCell cterm=reverse gui=reverse
 highlight PlayerChar cterm=bold ctermfg=White ctermbg=Black guifg=White guibg=Black
+" Editing cursor - more visible highlight for editing levels (yellow/gold background)
+highlight EditingCursor cterm=bold ctermfg=Black ctermbg=Yellow guifg=Black guibg=Yellow
 
 " Override cursor highlighting to match PlayerChar (white on black)
 highlight Cursor ctermfg=White ctermbg=Black guifg=White guibg=Black
