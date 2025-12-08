@@ -2,22 +2,50 @@
 
 A game built inside Vim. Learn Vim commands by escaping mazes and solving puzzles.
 
-## Quick Start
+## Installation
+
+### Download (Recommended)
+
+1. Download the latest release from [Releases](https://github.com/NShumway/escape-vim/releases)
+2. Extract the tarball:
+   ```bash
+   tar -xzf escape-vim-*-macos-arm64.tar.gz
+   cd escape-vim-*-macos-arm64
+   ```
+3. Run the installer:
+   ```bash
+   ./install.sh
+   ```
+4. Play!
+   ```bash
+   escape-vim
+   ```
+
+### Uninstall
 
 ```bash
+~/.escape-vim/uninstall.sh
+```
+
+### Build from Source
+
+```bash
+make
 ./play.sh
 ```
 
 ## Requirements
 
-- macOS (currently) with Xcode command line tools
+- macOS with Apple Silicon (arm64)
 - Terminal with 256-color support
+- Xcode command line tools (for building from source only)
 
-## Building from Source
+## Commands
 
 ```bash
-make
-./play.sh
+escape-vim          # Start the game
+escape-vim --reset  # Clear save data
+escape-vim --help   # Show help
 ```
 
 ## About
